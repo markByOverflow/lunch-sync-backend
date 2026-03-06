@@ -1,0 +1,77 @@
+[
+    {
+        "id": 12,
+        "name": "Sang trọng",
+        "urlRewriteName": "sang-trong"
+    },
+    {
+        "id": 39,
+        "name": "Buffet",
+        "urlRewriteName": "buffet"
+    },
+    {
+        "id": 1,
+        "name": "Nhà hàng",
+        "urlRewriteName": "nha-hang"
+    },
+    {
+        "id": 11,
+        "name": "Ăn vặt/vỉa hè",
+        "urlRewriteName": "an-vat-via-he"
+    },
+    {
+        "id": 56,
+        "name": "Ăn chay",
+        "urlRewriteName": "an-chay"
+    },
+    {
+        "id": 2,
+        "name": "Café/Dessert",
+        "urlRewriteName": "cafe"
+    },
+    {
+        "id": 3,
+        "name": "Quán ăn",
+        "urlRewriteName": "quan-an"
+    },
+    {
+        "id": 4,
+        "name": "Bar/Pub",
+        "urlRewriteName": "bar-pub"
+    },
+    {
+        "id": 54,
+        "name": "Quán nhậu",
+        "urlRewriteName": "quan-nhau"
+    },
+    {
+        "id": 43,
+        "name": "Beer club",
+        "urlRewriteName": "beer-club"
+    },
+    {
+        "id": 6,
+        "name": "Tiệm bánh",
+        "urlRewriteName": "tiem-banh"
+    },
+    {
+        "id": 44,
+        "name": "Tiệc tận nơi",
+        "urlRewriteName": "tiec-tan-noi"
+    },
+    {
+        "id": 27,
+        "name": "Shop Online",
+        "urlRewriteName": "shop-online"
+    },
+    {
+        "id": 28,
+        "name": "Giao cơm văn phòng",
+        "urlRewriteName": "giao-com-van-phong"
+    },
+    {
+        "id": 79,
+        "name": "Khu Ẩm Thực",
+        "urlRewriteName": "Foodcourt"
+    }
+]
