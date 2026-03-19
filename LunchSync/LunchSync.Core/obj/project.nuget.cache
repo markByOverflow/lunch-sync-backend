@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "jfnBm082ISQ=",
+  "success": true,
+  "projectFilePath": "D:\\AWS\\Project\\lunch-sync-backend-feat-session\\LunchSync\\LunchSync.Core\\LunchSync.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\PC\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.14\\microsoft.extensions.dependencyinjection.abstractions.9.0.14.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.9\\microsoft.netcore.app.ref.9.0.9.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.9\\microsoft.windowsdesktop.app.ref.9.0.9.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.9\\microsoft.aspnetcore.app.ref.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}

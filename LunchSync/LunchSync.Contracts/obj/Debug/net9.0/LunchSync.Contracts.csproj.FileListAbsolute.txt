@@ -1,0 +1,11 @@
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\bin\Debug\net9.0\LunchSync.Contracts.deps.json
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\bin\Debug\net9.0\LunchSync.Contracts.dll
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\bin\Debug\net9.0\LunchSync.Contracts.pdb
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.AssemblyInfoInputs.cache
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.AssemblyInfo.cs
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.csproj.CoreCompileInputs.cache
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.dll
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\refint\LunchSync.Contracts.dll
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\LunchSync.Contracts.pdb
+D:\AWS\Project\lunch-sync-backend-feat-session\LunchSync\LunchSync.Contracts\obj\Debug\net9.0\ref\LunchSync.Contracts.dll

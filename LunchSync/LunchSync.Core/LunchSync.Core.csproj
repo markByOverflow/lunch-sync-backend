@@ -17,4 +17,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.14" />
   </ItemGroup>
 
+<<<<<<< HEAD
+=======
+  <ItemGroup>
+    <ProjectReference Include="..\LunchSync.Contracts\LunchSync.Contracts.csproj" />
+  </ItemGroup>
+
+>>>>>>> 73f9833 (feat(dto+matching))
 </Project>
