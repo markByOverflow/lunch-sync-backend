@@ -41,8 +41,10 @@ public class SessionsController : ControllerBase
 
     // POST: /sessions/{pin}/start - Bắt đầu voting [Auth: Host]
     [HttpPost("{pin}/start")]
-    public async Task<IActionResult> StartAsync([FromRoute] string pin, [FromHeader] Guid hostId)
+    public async Task<IActionResult> StartAsync([FromRoute] string pin)
     {
+        // Giả sử HostId được lấy từ Token/Identity. Ở đây tạm lấy từ Header hoặc Guid mẫu.
+        var hostId = Guid.NewGuid();
         var validPin = Pin.Create(pin);
         var result = await _sessionService.StartSessionAsync(validPin.Value, hostId);
         return Ok(result);
@@ -60,7 +62,7 @@ public class SessionsController : ControllerBase
 
     // GET: /sessions/{pin} - Lấy session status [Public]
     [AllowAnonymous]
-    [HttpGet("{pin}/{sessionId}/status")]
+    [HttpGet("{pin}/{sessionId:guid}/status")]
     public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
     {
         var validPin = Pin.Create(pin);
@@ -76,7 +78,7 @@ public class SessionsController : ControllerBase
 
     // GET: /sessions/{pin} - Lấy session info [Public]
     [AllowAnonymous]
-    [HttpGet("{pin}/{sessionId}/info")]
+    [HttpGet("{pin}/{sessionId:guid}/info")]
     public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
     {
         var validPin = Pin.Create(pin);
@@ -91,7 +93,7 @@ public class SessionsController : ControllerBase
 
     // GET: /sessions/history/{sessionId} - Lấy từ DB khi cache/local mất
     [AllowAnonymous]
-    [HttpGet("history/{sessionId}")]
+    [HttpGet("history/{sessionId:guid}")]
     public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId)
     {
         var session = await _sessionService.GetSessionHistoryAsync(sessionId) ?? throw new EntityNotFoundException("session", sessionId);
