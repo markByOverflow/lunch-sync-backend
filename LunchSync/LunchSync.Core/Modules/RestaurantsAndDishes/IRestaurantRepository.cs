@@ -8,4 +8,6 @@ public interface IRestaurantRepository
 
     // Lấy danh sách nhà hàng theo danh sách ID (dùng cho logic xử lý sau voting)
     Task<IEnumerable<Restaurant>> GetRestaurantsByIdsAsync(IEnumerable<Guid> ids);
+    /// Lấy danh sách nhà hàng phục vụ ít nhất 1 món trong top dish
+    Task<IEnumerable<Restaurant>> GetRestaurantsByTopDishesAsync(Guid collectionId, IEnumerable<Guid> topDishIds);
 }
