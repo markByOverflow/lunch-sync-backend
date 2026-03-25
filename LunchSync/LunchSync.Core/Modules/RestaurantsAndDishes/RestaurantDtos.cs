@@ -11,7 +11,7 @@ public class RestaurantBriefDto
     public string PriceDisplay { get; set; } = string.Empty;
     public double Rating { get; set; }
     public string? ThumbnailUrl { get; set; }
-    public List<Dish> FeaturedDishes { get; set; } = new();
+    public List<string> FeaturedDishes { get; set; } = new();
 }
 
 public class CollectionDetailDto
@@ -20,7 +20,7 @@ public class CollectionDetailDto
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public double LandmarkLat { get; set; }
-    public double LandmarkLng { get; set; }
+    public double LandmarkLon { get; set; }
     public int CoverageRadiusMeters { get; set; }
     public string Status { get; set; } = string.Empty;
     public List<RestaurantBriefDto> Restaurants { get; set; } = new();
