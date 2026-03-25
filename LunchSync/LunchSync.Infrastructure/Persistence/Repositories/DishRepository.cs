@@ -60,16 +60,4 @@ public class DishRepository : IDishRepository
             Profile = d.Profile
         });
     }
-
-    // Lọc món theo Collection để làm đầu vào cho Scoring
-    public async Task<IEnumerable<Dish>> GetDishesByCollectionAsync(Guid collectionId)
-    {
-        return await _context.RestaurantCollections
-            .Where(rc => rc.CollectionId == collectionId)
-            .SelectMany(rc => rc.Restaurant.RestaurantDishes)
-            .Select(rd => rd.Dish).Where(d => d != null)
-            .Distinct()
-            .AsNoTracking()
-            .ToListAsync();
-    }
 }
