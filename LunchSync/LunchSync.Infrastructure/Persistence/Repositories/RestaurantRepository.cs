@@ -37,4 +37,16 @@ public class RestaurantRepository : IRestaurantRepository
             .AsNoTracking()
             .ToListAsync();
     }
+    //Danh sách nhà hàng theo top dishes
+    public async Task<IEnumerable<Restaurant>> GetRestaurantsByTopDishesAsync(Guid collectionId, IEnumerable<Guid> topDishIds)
+    {
+        return await _context.RestaurantCollections
+            .Where(rc => rc.CollectionId == collectionId)
+            .Select(rc => rc.Restaurant)
+            .Include(r => r.RestaurantDishes)
+                .ThenInclude(rd => rd.Dish)
+            .Where(r => r.RestaurantDishes.Any(rd => topDishIds.Contains(rd.DishId)))
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }
