@@ -1,0 +1,37 @@
+﻿using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Modules.RestaurantsAndDishes;
+using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
+
+using Microsoft.EntityFrameworkCore;
+namespace LunchSync.Infrastructure.Persistence.Repositories;
+
+public class CollectionRepository : ICollectionRepository
+{
+    private readonly AppDbContext _context;
+
+    public CollectionRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IEnumerable<Collection>> GetAllActiveCollectionsAsync()
+    {
+        return await _context.Collections
+            .Include(c => c.RestaurantCollections) // Load bảng trung gian Collection-Restaurant
+                .ThenInclude(rc => rc.Restaurant) // Load thông tin Restaurant để check Status
+            .Where(c => c.Status == CollectionStatus.Active)
+            .AsNoTracking() // Tối ưu hiệu năng vì chỉ dùng để hiển thị
+            .ToListAsync();
+    }
+
+    public async Task<Collection?> GetCollectionByIdAsync(Guid id)
+    {
+        return await _context.Collections
+            .Include(c => c.RestaurantCollections)
+                .ThenInclude(rc => rc.Restaurant)
+                    .ThenInclude(r => r.RestaurantDishes) // Load tiếp bảng trung gian Restaurant-Dish
+                        .ThenInclude(rd => rd.Dish)      // Load thông tin Dish cuối cùng để lấy Name
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
+}
