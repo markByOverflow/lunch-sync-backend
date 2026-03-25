@@ -34,4 +34,14 @@ public class CollectionRepository : ICollectionRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
     }
+
+    public async Task<IEnumerable<Guid>> GetAvailableDishIdsInCollectionAsync(Guid collectionId)
+    {
+        return await _context.RestaurantCollections
+            .Where(rc => rc.CollectionId == collectionId)
+            .SelectMany(rc => rc.Restaurant.RestaurantDishes)
+            .Select(rd => rd.DishId) // Chỉ lấy ID để nhẹ truy vấn
+            .Distinct()
+            .ToListAsync();
+    }
 }
