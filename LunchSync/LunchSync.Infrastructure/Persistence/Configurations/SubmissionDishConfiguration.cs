@@ -19,8 +19,8 @@ public class SubmissionDishConfiguration : IEntityTypeConfiguration<SubmissionDi
                .HasForeignKey(sd => sd.SubmissionId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(d => d.Dish)
-               .WithMany()
+        builder.HasOne(sd => sd.Dish)
+               .WithMany(d => d.SubmissionDishes)
                .HasForeignKey(sd => sd.DishId)
                .OnDelete(DeleteBehavior.Cascade);
     }
