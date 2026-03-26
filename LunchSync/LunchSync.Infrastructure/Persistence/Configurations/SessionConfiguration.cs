@@ -48,20 +48,14 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(e => e.CreatedAt).IsRequired().HasColumnType("timestamp with time zone");
         builder.Property(e => e.ExpiresAt).HasColumnType("timestamp with time zone");
 
-
-        builder.HasMany(e => e.Participants)
-                      .WithOne()
-                      .HasForeignKey(e => e.SessionId)
-                      .OnDelete(DeleteBehavior.Cascade); // Xóa Session thì xóa sạch Participant
-
         builder.HasOne(s => s.Host)
            .WithMany()
-           .HasForeignKey(e => e.HostId)
+           .HasForeignKey(s => s.HostId)
            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(s => s.Collection)
            .WithMany()
-           .HasForeignKey(e => e.CollectionId)
+           .HasForeignKey(s => s.CollectionId)
            .OnDelete(DeleteBehavior.Restrict);
     }
 }
