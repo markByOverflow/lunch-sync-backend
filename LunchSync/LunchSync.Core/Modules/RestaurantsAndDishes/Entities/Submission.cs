@@ -11,7 +11,7 @@ public class Submission : BaseEntity
     public string Address { get; set; } = null!;
     public string? GoogleMapsUrl { get; set; }
     public PriceTier? PriceTier { get; set; }
-    public string? Note { get; set; }
+    public string? Notes { get; set; }
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
     public Guid? ReviewedBy { get; set; }
     public DateTime? ReviewedAt { get; set; }

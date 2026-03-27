@@ -11,8 +11,13 @@ public class SubmissionDishConfiguration : IEntityTypeConfiguration<SubmissionDi
     {
         builder.ToTable("submission_dishes");
 
-        // Composite Key: PRIMARY KEY (submission_id, dish_id)
         builder.HasKey(sd => new { sd.SubmissionId, sd.DishId });
+
+        builder.Property(sd => sd.SubmissionId)
+               .HasColumnName("submission_id");
+
+        builder.Property(sd => sd.DishId)
+               .HasColumnName("dish_id");
 
         builder.HasOne(sd => sd.Submission)
                .WithMany(s => s.SubmissionDishes)

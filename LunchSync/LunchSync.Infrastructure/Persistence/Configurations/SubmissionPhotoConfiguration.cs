@@ -10,20 +10,36 @@ public class SubmissionPhotoConfiguration : IEntityTypeConfiguration<SubmissionP
     public void Configure(EntityTypeBuilder<SubmissionPhoto> builder)
     {
         builder.ToTable("submission_photos");
+
         builder.HasKey(p => p.Id);
-        builder.Property(p => p.Id).HasDefaultValueSql("gen_random_uuid()");
+        builder.Property(p => p.Id)
+               .HasColumnName("id")
+               .HasDefaultValueSql("gen_random_uuid()");
 
-        builder.Property(p => p.PhotoUrl).IsRequired();
-        builder.Property(p => p.DisplayOrder).HasDefaultValue(0);
-        builder.Property(p => p.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("NOW()");
+        builder.Property(p => p.SubmissionId)
+               .HasColumnName("submission_id")
+               .IsRequired();
 
-        // Cấu hình Quan hệ & Cascade Delete
+        builder.Property(p => p.PhotoUrl)
+               .HasColumnName("photo_url")
+               .IsRequired();
+
+        builder.Property(p => p.DisplayOrder)
+               .HasColumnName("display_order")
+               .IsRequired()
+               .HasDefaultValue(0);
+
+        builder.Property(p => p.CreatedAt)
+               .HasColumnName("created_at")
+               .HasColumnType("timestamp with time zone")
+               .HasDefaultValueSql("NOW()");
+
         builder.HasOne(p => p.Submission)
                .WithMany(s => s.Photos)
                .HasForeignKey(p => p.SubmissionId)
-               .OnDelete(DeleteBehavior.Cascade); // ON DELETE CASCADE
+               .OnDelete(DeleteBehavior.Cascade);
 
-        // Index cho FK
-        builder.HasIndex(p => p.SubmissionId).HasDatabaseName("idx_submission_photos_sub");
+        builder.HasIndex(p => p.SubmissionId)
+               .HasDatabaseName("idx_submission_photos_sub");
     }
 }
