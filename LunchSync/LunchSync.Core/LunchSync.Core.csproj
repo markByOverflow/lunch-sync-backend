@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="Modules\Admin\" />
     <Folder Include="Modules\Auth\Entities\" />
-    <Folder Include="Modules\Sessions\Entities\" />
     <Folder Include="Modules\VotingAndScoring\Entities\" />
   </ItemGroup>
 
