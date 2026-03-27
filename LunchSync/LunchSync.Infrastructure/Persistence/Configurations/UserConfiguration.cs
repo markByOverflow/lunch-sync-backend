@@ -15,28 +15,45 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         // 2. Khóa chính
         builder.HasKey(u => u.Id);
-        builder.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
 
+        builder.Property(u => u.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("gen_random_uuid()");
 
-        // 3. Cấu hình các cột theo Schema
-        builder.Property(u => u.CognitoSub).IsRequired().HasMaxLength(255);
-
-        builder.Property(u => u.Email).IsRequired().HasMaxLength(255);
-        builder.HasIndex(u => u.Email).IsUnique();
-
-        builder.Property(u => u.FullName).HasMaxLength(255);
-
-        builder.Property(u => u.Role).HasConversion<string>().HasDefaultValue(UserRole.Host); // Mặc định là host theo schema
-
-        builder.Property(u => u.IsActive).IsRequired().HasDefaultValue(true);
-        builder.Property(u => u.CreatedAt).HasDefaultValueSql("NOW()").HasColumnType("timestamp with time zone");
-
-        // 4. Index (Dựa trên các khối highlight xanh trong hình schema)
+        builder.Property(u => u.CognitoSub)
+            .HasColumnName("cognito_sub")
+            .IsRequired()
+            .HasMaxLength(255);
         builder.HasIndex(u => u.CognitoSub)
-               .IsUnique()
-               .HasDatabaseName("idx_users_cognito_sub");
+           .IsUnique()
+           .HasDatabaseName("idx_users_cognito_sub");
 
-        builder.HasIndex(u => u.Role)
-               .HasDatabaseName("idx_users_role");
+        builder.Property(u => u.Email)
+               .HasColumnName("email")
+               .IsRequired()
+               .HasMaxLength(255);
+        builder.HasIndex(u => u.Email)
+               .IsUnique();
+
+        builder.Property(u => u.FullName)
+               .HasColumnName("full_name")
+               .HasMaxLength(255);
+
+        builder.Property(u => u.Role)
+               .HasColumnName("role")
+               .HasConversion<string>()
+               .HasDefaultValue(UserRole.Host);
+        builder.HasIndex(u => u.Role).HasDatabaseName("idx_users_role");
+
+        builder.Property(u => u.IsActive)
+               .HasColumnName("is_active")
+               .IsRequired()
+               .HasDefaultValue(true);
+
+        builder.Property(u => u.CreatedAt)
+               .HasColumnName("created_at")
+               .HasColumnType("timestamp with time zone")
+               .HasDefaultValueSql("NOW()");
+
     }
 }
