@@ -1,57 +1,97 @@
-using LunchSync.Core;
-using LunchSync.Infrastructure;
+using LunchSync.Api.Authentication;
 using LunchSync.Api.Middleware;
+using LunchSync.Api.Services;
+using LunchSync.Core;
+using LunchSync.Core.Common.Auth;
+using LunchSync.Core.Common.Interfaces;
+using LunchSync.Infrastructure;
 using Microsoft.OpenApi.Models;
 
-namespace LunchSync.Api
+namespace LunchSync.Api;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Dang ky service business va ha tang cho toan bo app.
+        builder.Services.AddCore();
+        builder.Services.AddInfrastructure(builder.Configuration);
+
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        // Cau hinh auth theo JWT cho host/user va guest.
+        builder.Services.AddLunchSyncAuthentication(builder.Configuration);
+
+        builder.Services.AddAuthorization(options =>
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add Layers
-            builder.Services.AddCore();
-            builder.Services.AddInfrastructure(builder.Configuration);
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
+            options.AddPolicy(AuthPolicies.CognitoUser, policy =>
             {
-                options.SwaggerDoc("v1", new()
-                {
-                    Title = "LunchSync API",
-                    Version = "v1",
-                    Description = "API for LunchSync - Group Lunch Decision App"
-                });
+                policy.RequireClaim(AuthClaimTypes.ActorType, AuthActorTypes.User);
             });
-            builder.Services.AddOpenApi();
 
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            options.AddPolicy(AuthPolicies.Guest, policy =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LunchSync API v1");
-                    c.RoutePrefix = string.Empty; // serve UI at application root
-                });
-            }
+                policy.RequireClaim(AuthClaimTypes.ActorType, AuthActorTypes.Guest);
+            });
+        });
 
-            app.UseHttpsRedirection();
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddHttpClient();
+        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-            // Gom loi domain/unhandled ve mot format response thong nhat.
-            app.UseGlobalExceptionHandler();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new()
+            {
+                Title = "LunchSync API",
+                Version = "v1",
+                Description = "API for LunchSync - Group Lunch Decision App"
+            });
 
-            app.UseAuthorization();
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Host/User token gui bang Authorization: Bearer <token>."
+            });
 
-            app.MapControllers();
+            options.AddSecurityDefinition("GuestToken", new OpenApiSecurityScheme
+            {
+                Name = AuthHeaderNames.GuestToken,
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Description = "Guest JWT issued by POST /api/auth/guest-token."
+            });
+        });
 
-            app.Run();
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "LunchSync API v1");
+                c.RoutePrefix = string.Empty;
+            });
         }
+
+        app.UseHttpsRedirection();
+
+        // Gom loi domain/unhandled ve mot format response thong nhat.
+        app.UseGlobalExceptionHandler();
+
+        // Xac thuc truoc, phan quyen sau.
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

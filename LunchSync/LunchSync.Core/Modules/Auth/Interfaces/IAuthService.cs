@@ -2,5 +2,6 @@ namespace LunchSync.Core.Modules.Auth.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResponse> HandleLoginAsync(string cognitoSub, string email, string? name);
+    Task<RegistrationStatusResponse> GetRegistrationStatusAsync(string cognitoSub, CancellationToken cancellationToken = default);
+    Task<RegisterCurrentUserResponse> RegisterCurrentUserAsync(RegisterCurrentUserRequest request, CancellationToken cancellationToken = default);
 }

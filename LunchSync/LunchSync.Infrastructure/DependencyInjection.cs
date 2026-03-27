@@ -1,8 +1,10 @@
+using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Repositories;
 using LunchSync.Core.Modules.Sessions;
+using LunchSync.Infrastructure.Auth;
 using LunchSync.Infrastructure.Persistence;
 using LunchSync.Infrastructure.Persistence.Caching;
 using LunchSync.Infrastructure.Persistence.Repositories;
@@ -34,10 +36,13 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(provider =>
             provider.GetRequiredService<AppDbContext>());
 
-        // Redis duoc restore de session cache/pin manager hoat dong lai.
         services.AddSingleton<IConnectionMultiplexer>(_ =>
             ConnectionMultiplexer.Connect(
                 configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false"));
+
+        // Bind auth options mot lan de token service dung chung config.
+        services.Configure<GuestTokenOptions>(
+            configuration.GetSection(GuestTokenOptions.SectionName));
 
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IDishRepository, DishRepository>();
@@ -46,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISessionCache, SessionCache>();
         services.AddScoped<IPinManager, PinManager>();
+        services.AddSingleton<IGuestTokenService, GuestTokenService>();
 
         return services;
     }
