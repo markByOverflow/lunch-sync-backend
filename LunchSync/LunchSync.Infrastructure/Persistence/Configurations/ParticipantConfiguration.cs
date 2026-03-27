@@ -11,7 +11,9 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
     {
         builder.ToTable("participants");
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+        builder.Property(e => e.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("gen_random_uuid()");
 
         builder.Property(p => p.SessionId)
                .HasColumnName("session_id")
