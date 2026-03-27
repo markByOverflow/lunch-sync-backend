@@ -11,10 +11,10 @@ namespace LunchSync.Core
     {
         public static IServiceCollection AddCore(this IServiceCollection services)
         {
-            // Dang ky business service theo module de controller chi phu thuoc interface.
+            // Giu auth/admin hien tai va them lai session service tu commit restore.
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<ICollectionService, CollectionService>();
+            services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<IAdminService, AdminService>();
 
             return services;

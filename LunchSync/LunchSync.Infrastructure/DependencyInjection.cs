@@ -1,13 +1,15 @@
-﻿using LunchSync.Core.Common.Interfaces;
+using LunchSync.Core.Common.Interfaces;
+using LunchSync.Core.Modules.Auth.Interfaces;
 using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Repositories;
 using LunchSync.Core.Modules.Sessions;
 using LunchSync.Infrastructure.Persistence;
+using LunchSync.Infrastructure.Persistence.Caching;
 using LunchSync.Infrastructure.Persistence.Repositories;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace LunchSync.Infrastructure;
 
@@ -17,41 +19,34 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // ===========================================
-        // Database
-        // ===========================================
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-
-                // Enable retry on failure
                 npgsqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 3,
                     maxRetryDelay: TimeSpan.FromSeconds(30),
                     errorCodesToAdd: null);
             }).UseSnakeCaseNamingConvention());
 
-        // Register IUnitOfWork yet done !!!
         services.AddScoped<IUnitOfWork>(provider =>
             provider.GetRequiredService<AppDbContext>());
 
-        // ── Repositories ──
+        // Redis duoc restore de session cache/pin manager hoat dong lai.
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(
+                configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false"));
+
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IDishRepository, DishRepository>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<ICollectionRepository, CollectionRepository>();
-
-        // ── Caching ──
-        //services.AddSingleton<IDishProfileCache, InMemoryDishProfileCache>();
-
-        // ── Auth (Cognito) ──
-        //services.AddScoped<ICognitoAuthProvider, CognitoAuthProvider>();
-
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISessionCache, SessionCache>();
+        services.AddScoped<IPinManager, PinManager>();
 
         return services;
     }
 }
-

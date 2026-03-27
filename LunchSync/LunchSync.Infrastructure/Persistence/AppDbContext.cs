@@ -26,7 +26,7 @@ public class AppDbContext : DbContext, IUnitOfWork
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply tat ca configuration trong Infrastructure de tranh map thieu khi merge.
+        // Apply tat ca configuration khi session module duoc restore lai.
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
