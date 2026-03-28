@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using LunchSync.Core.Modules.RestaurantsAndDishes;
+using LunchSync.Core.Modules.Sessions;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LunchSync.Core
 {
@@ -10,7 +13,7 @@ namespace LunchSync.Core
             //services.AddScoped<IAuthService, AuthService>();
 
             // Sessions
-            //services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<ISessionService, SessionService>();
             //services.AddScoped<IResultsService, ResultsService>();
 
             // Voting & Scoring
@@ -19,7 +22,7 @@ namespace LunchSync.Core
             //services.AddSingleton<ScoringEngine>();         // stateless math — singleton OK
 
             // Restaurants & Dishes
-            //services.AddScoped<ICollectionService, CollectionService>();
+            services.AddScoped<ICollectionService, CollectionService>();
             //services.AddScoped<ISubmissionService, SubmissionService>();
 
             // Admin
