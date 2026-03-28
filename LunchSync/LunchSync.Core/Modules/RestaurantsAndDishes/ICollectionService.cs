@@ -5,8 +5,8 @@ namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 public interface ICollectionService
 {
     // GET /collections
-    Task<IEnumerable<CollectionSummaryDto>> GetAllActiveCollectionsAsync();
+    Task<IEnumerable<CollectionSummaryRes>> GetAllActiveCollectionsAsync();
 
     // GET /collections/{id}
-    Task<CollectionDetailDto?> GetCollectionDetailAsync(Guid id);
+    Task<CollectionDetailRes?> GetCollectionDetailAsync(Guid id);
 }

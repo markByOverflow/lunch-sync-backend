@@ -11,16 +11,18 @@ public class CollectionService : ICollectionService
         _collectionRepository = collectionRepository;
     }
 
-    public async Task<IEnumerable<CollectionSummaryDto>> GetAllActiveCollectionsAsync()
+    public async Task<IEnumerable<CollectionSummaryRes>> GetAllActiveCollectionsAsync()
     {
         var collections = await _collectionRepository.GetAllActiveCollectionsAsync();
 
-        return collections.Select(RestaurantMappers.ToSummaryDto);
+        return collections.Select(ResDisColMappers.ToCollectionSummaryRes);
     }
 
-    public async Task<CollectionDetailDto?> GetCollectionDetailAsync(Guid id)
+    public async Task<CollectionDetailRes?> GetCollectionDetailAsync(Guid id)
     {
         var collection = await _collectionRepository.GetCollectionByIdAsync(id) ?? throw new CollectionNotFoundException(id);
-        return RestaurantMappers.ToDetailDto(collection);
+
+        return ResDisColMappers.ToCollectionDetailRes(collection);
+
     }
 }
