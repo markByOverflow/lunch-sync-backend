@@ -1,5 +1,6 @@
 ﻿using LunchSync.Core;
 using LunchSync.Infrastructure;
+using LunchSync.Api.Middleware;
 
 using Microsoft.OpenApi.Models;
 
@@ -43,6 +44,8 @@ namespace LunchSync.Api
             }
 
             app.UseHttpsRedirection();
+
+            app.UseGlobalExceptionHandler();
 
             app.UseAuthorization();
 
