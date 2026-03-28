@@ -12,6 +12,12 @@ public class SessionNotFoundException : NotFoundException
 {
     public SessionNotFoundException(string pin)
         : base($"Không tìm thấy phiên với mã PIN '{pin}'", "SESSION_NOT_FOUND") { }
+
+}
+public class SessionNotFoundByIdException : NotFoundException
+{
+    public SessionNotFoundByIdException(Guid sessionId)
+        : base($"Không tìm thấy phiên với ID '{sessionId}'", "SESSION_NOT_FOUND") { }
 }
 
 public class DishNotFoundException : NotFoundException

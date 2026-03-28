@@ -66,11 +66,10 @@ public class SessionsController : ControllerBase
     public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value);
-
-        if (session == null || (session.Id != sessionId))
+        var session = await _sessionService.GetSessionAsync(validPin.Value) ?? throw new SessionNotFoundException(pin);
+        if (session.Id != sessionId)
         {
-            throw new EntityNotFoundException("session", sessionId);
+            throw new SessionNotFoundByIdException(sessionId);
         }
 
         return Ok(session.ToStatusDto());
@@ -82,12 +81,11 @@ public class SessionsController : ControllerBase
     public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value);
-        if (session == null || (session.Id != sessionId))
+        var session = await _sessionService.GetSessionAsync(validPin.Value) ?? throw new SessionNotFoundException(pin);
+        if (session.Id != sessionId)
         {
-            throw new EntityNotFoundException("session", sessionId);
+            throw new SessionNotFoundByIdException(sessionId);
         }
-
         return Ok(session.ToInfoDto());
     }
 
@@ -96,7 +94,7 @@ public class SessionsController : ControllerBase
     [HttpGet("history/{sessionId:guid}")]
     public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId)
     {
-        var session = await _sessionService.GetSessionHistoryAsync(sessionId) ?? throw new EntityNotFoundException("session", sessionId);
+        var session = await _sessionService.GetSessionHistoryAsync(sessionId) ?? throw new SessionNotFoundByIdException(sessionId);
         return Ok(session.ToInfoDto());
     }
 }

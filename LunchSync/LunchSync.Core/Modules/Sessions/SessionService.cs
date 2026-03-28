@@ -123,14 +123,10 @@ public class SessionService : ISessionService
 
     //GET status+info => Object Session
     public async Task<Session?> GetSessionAsync(string pin)
-    => await _cache.GetActiveSessionByPinAsync(pin) ?? throw new SessionNotFoundException(pin);
+    => await _cache.GetActiveSessionByPinAsync(pin);
 
     //GET Session trong db
     public async Task<Session?> GetSessionHistoryAsync(Guid sessionId)
-    {
-        // Truy cập DB để lấy dữ liệu lịch sử
-        var history = await _repository.GetHistoryByIdAsync(sessionId) ?? throw new BusinessRuleViolationException("Không tìm thấy thông tin lịch sử của phiên này.");
-        return history;
-    }
+    => await _repository.GetHistoryByIdAsync(sessionId);
 
 }
