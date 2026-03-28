@@ -36,7 +36,7 @@ public class CollectionSummaryRes
     public string Status { get; set; } = string.Empty;
 }
 
-public class DishListResponse
+public class DishListRes
 {
     public List<DishSummaryRes> Dishes { get; set; } = [];
     public List<string> Categories { get; set; } = [];
