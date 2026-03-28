@@ -20,11 +20,7 @@ public class CollectionService : ICollectionService
 
     public async Task<CollectionDetailDto?> GetCollectionDetailAsync(Guid id)
     {
-        var collection = await _collectionRepository.GetCollectionByIdAsync(id);
-
-        if (collection == null)
-            throw new EntityNotFoundException("collection", id);
-
+        var collection = await _collectionRepository.GetCollectionByIdAsync(id) ?? throw new CollectionNotFoundException(id);
         return RestaurantMappers.ToDetailDto(collection);
     }
 }

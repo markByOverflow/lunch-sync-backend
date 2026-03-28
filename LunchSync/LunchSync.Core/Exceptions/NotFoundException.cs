@@ -20,6 +20,12 @@ public class DishNotFoundException : NotFoundException
         : base("Không tìm thấy món ăn ", "DISH_NOT_FOUND") { }
 }
 
+public class CollectionNotFoundException : NotFoundException
+{
+    public CollectionNotFoundException(Guid collectionId)
+        : base("Không tìm thấy bộ sưu tập ", "COLLECTION_NOT_FOUND") { }
+}
+
 public class SubmissionNotFoundException : NotFoundException
 {
     public SubmissionNotFoundException(Guid submissionId)
