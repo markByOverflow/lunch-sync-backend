@@ -31,7 +31,11 @@ public class CollectionNotFoundException : NotFoundException
     public CollectionNotFoundException(Guid collectionId)
         : base("Không tìm thấy bộ sưu tập ", "COLLECTION_NOT_FOUND") { }
 }
-
+public class RestaurantNotFoundException : NotFoundException
+{
+    public RestaurantNotFoundException(Guid restaurantId)
+        : base("Không tìm thấy nhà hàng", "RESTAURANT_NOT_FOUND") { }
+}
 public class SubmissionNotFoundException : NotFoundException
 {
     public SubmissionNotFoundException(Guid submissionId)
