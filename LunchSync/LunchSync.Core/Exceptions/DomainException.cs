@@ -1,6 +1,7 @@
 ﻿using System.Net;
 
 namespace LunchSync.Core.Exceptions;
+
 public abstract class DomainException : Exception
 {
     public string ErrorCode { get; }
@@ -29,16 +30,6 @@ public abstract class DomainException : Exception
 }
 
 // Concrete exceptions
-public class EntityNotFoundException : DomainException
-{
-    public EntityNotFoundException(string entity, object id)
-        : base(
-            message: $"{entity} with id '{id}' was not found",
-            errorCode: $"{entity.ToUpper()}_NOT_FOUND",
-            statusCode: HttpStatusCode.NotFound)
-    { }
-}
-
 public class BusinessRuleViolationException : DomainException
 {
     public BusinessRuleViolationException(string rule)
@@ -46,15 +37,5 @@ public class BusinessRuleViolationException : DomainException
             message: $"Business rule violated: {rule}",
             errorCode: "BUSINESS_RULE_VIOLATION",
             statusCode: HttpStatusCode.UnprocessableEntity)
-    { }
-}
-
-public class DuplicateEntityException : DomainException
-{
-    public DuplicateEntityException(string entity, string field, object value)
-        : base(
-            message: $"{entity} with {field} '{value}' already exists",
-            errorCode: $"{entity.ToUpperInvariant()}_DUPLICATE",
-            statusCode: HttpStatusCode.Conflict)
     { }
 }
