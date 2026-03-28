@@ -6,7 +6,7 @@ namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 public static class ResDisColMappers
 {
     //collection
-    public static CollectionSummaryRes ToCollectionSummaryRes(Collection collection)
+    public static CollectionSummaryRes ToCollectionSummaryRes(this Collection collection)
     {
         return new CollectionSummaryRes
         {
@@ -18,7 +18,7 @@ public static class ResDisColMappers
             Status = collection.Status.ToString()
         };
     }
-    public static CollectionDetailRes ToCollectionDetailRes(Collection collection)
+    public static CollectionDetailRes ToCollectionDetailRes(this Collection collection)
     {
         return new CollectionDetailRes
         {
@@ -35,7 +35,7 @@ public static class ResDisColMappers
         };
     }
     //Dish
-    public static DishSummaryRes ToDishSummaryRes(Dish dish)
+    public static DishSummaryRes ToDishSummaryRes(this Dish dish)
     {
         return new DishSummaryRes
         {
@@ -45,10 +45,10 @@ public static class ResDisColMappers
         };
     }
 
-    public static DishDetailRes ToDishDetailRes(Dish dish)
+    public static DishDetailRes ToDishDetailRes(this Dish dish)
     {
         var servedAt = dish.RestaurantDishes
-            .Select(rd => ToServedAtRes(rd.Restaurant))
+            .Select(rd => rd.Restaurant.ToServedAtRes())
             .ToList();
 
         return new DishDetailRes
@@ -61,7 +61,7 @@ public static class ResDisColMappers
         };
     }
 
-    public static ServedAtRes ToServedAtRes(Restaurant restaurant)
+    public static ServedAtRes ToServedAtRes(this Restaurant restaurant)
     {
         // Pick the first collection name as the display collection
         var collectionName = restaurant.RestaurantCollections
@@ -81,7 +81,7 @@ public static class ResDisColMappers
         };
     }
 
-    public static DishListRes ToDishListRes(List<Dish> dishes)
+    public static DishListRes ToDishListRes(this IEnumerable<Dish> dishes)
     {
         var categories = dishes
             .Select(d => d.Category)
@@ -91,13 +91,13 @@ public static class ResDisColMappers
 
         return new DishListRes
         {
-            Dishes = dishes.Select(ToDishSummaryRes).ToList(),
+            Dishes = dishes.Select(d => d.ToDishSummaryRes()).ToList(),
             Categories = categories,
-            TotalCount = dishes.Count
+            TotalCount = dishes.Count()
         };
     }
     //Restaurant
-    private static RestaurantCardRes ToRestaurantCardRes(Restaurant r)
+    private static RestaurantCardRes ToRestaurantCardRes(this Restaurant r)
     {
         return new RestaurantCardRes
         {
@@ -113,7 +113,7 @@ public static class ResDisColMappers
             .Select(rd => rd.Dish.Name).Take(3).ToList() ?? new List<string>()
         };
     }
-    public static RestaurantDetailRes ToRestaurantDetailRes(Restaurant restaurant)
+    public static RestaurantDetailRes ToRestaurantDetailRes(this Restaurant restaurant)
     {
         return new RestaurantDetailRes
         {
@@ -127,7 +127,7 @@ public static class ResDisColMappers
             ThumbnailUrl = restaurant.ThumbnailUrl,
 
             Dishes = restaurant.RestaurantDishes
-                .Select(rd => ToDishSummaryRes(rd.Dish))
+                .Select(rd => rd.Dish.ToDishSummaryRes())
                 .ToList(),
 
             Collections = restaurant.RestaurantCollections
