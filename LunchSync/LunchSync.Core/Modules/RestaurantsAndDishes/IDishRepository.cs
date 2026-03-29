@@ -4,10 +4,14 @@ namespace LunchSync.Core.Modules.RestaurantsAndDishes.Repositories;
 
 public interface IDishRepository
 {
-    Task<Dish?> GetDishWithRestaurantsAsync(Guid id);
+    // menu trong get restaurant
+    Task<List<Dish>> GetDishByRestaurantsAsync(Guid restaurantId, CancellationToken ct = default);
+
+    Task<Dish?> GetDishByIdAsync(Guid id, CancellationToken ct = default);
 
     // Tìm kiếm món ăn theo tên hoặc danh mục
-    Task<IEnumerable<Dish>> SearchDishesAsync(string searchTerm);
-    // Lấy toàn bộ Profile để nạp vào IDishProfileCache (Scoring Engine)
-    Task<IEnumerable<Dish>> GetAllDishProfilesAsync();
+    Task<List<Dish>> SearchDishesAsync(string? searchTerm, string? category, CancellationToken ct = default);
+
+    // Nạp Cache IDishProfileCache (Scoring Engine)
+    Task<List<Dish>> GetAllDishProfilesAsync(CancellationToken ct = default);
 }

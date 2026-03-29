@@ -13,51 +13,43 @@ public class DishRepository : IDishRepository
     {
         _context = context;
     }
-    // Phase 3: Tìm xem món ăn này có ở những quán nào
-    public async Task<Dish?> GetDishWithRestaurantsAsync(Guid id)
+    // menu trong get restaurant
+    public async Task<List<Dish>> GetDishByRestaurantsAsync(Guid restaurantId, CancellationToken ct = default)
     {
         return await _context.Dishes
-            .Include(d => d.RestaurantDishes)
-                .ThenInclude(rd => rd.Restaurant)
+            .Where(d => d.RestaurantDishes.Any(rd => rd.RestaurantId == restaurantId))
+            .Select(d => new Dish { Id = d.Id, Name = d.Name, Category = d.Category })
             .AsNoTracking()
-            .FirstOrDefaultAsync(d => d.Id == id);
+            .ToListAsync(ct);
     }
-
-    //Fuzzy
-    public async Task<IEnumerable<Dish>> SearchDishesAsync(string searchTerm)
+    public async Task<Dish?> GetDishByIdAsync(Guid id, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-            return Enumerable.Empty<Dish>();
-
         return await _context.Dishes
-        .Where(d => d.Name.Contains(searchTerm) || d.Category.Contains(searchTerm))
-        .OrderBy(d => d.Name.StartsWith(searchTerm) ? 0 : 1) // Ưu tiên những món bắt đầu bằng từ khóa
-        .ThenBy(d => d.Name)
-        .Take(5)
-        .AsNoTracking()
-        .ToListAsync();
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == id, ct);
+    }
+    //Fuzzy
+    public async Task<List<Dish>> SearchDishesAsync(string? searchTerm, string? category, CancellationToken ct = default)
+    {
+        var query = _context.Dishes.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query.Where(d => d.Name.Contains(searchTerm) || d.Category.Contains(searchTerm));
+
+        if (!string.IsNullOrWhiteSpace(category))
+            query = query.Where(d => d.Category == category);
+
+        return await query
+            .OrderBy(d => d.Name)
+            .Take(5)
+            .ToListAsync(ct);
     }
 
     // Nạp Cache cho Scoring Engine (0.01ms access)
-    public async Task<IEnumerable<Dish>> GetAllDishProfilesAsync()
+    public async Task<List<Dish>> GetAllDishProfilesAsync(CancellationToken ct = default)
     {
-
-        var data = await _context.Dishes
-            .Select(d => new
-            {
-                d.Id,
-                d.Name,
-                d.Profile
-            })
-            .AsNoTracking()
-            .ToListAsync();
-
-
-        return data.Select(d => new Dish
-        {
-            Id = d.Id,
-            Name = d.Name,
-            Profile = d.Profile
-        });
+        return await _context.Dishes
+                    .Select(d => new Dish { Id = d.Id, Name = d.Name, Profile = d.Profile })
+                    .AsNoTracking().ToListAsync(ct);
     }
 }
