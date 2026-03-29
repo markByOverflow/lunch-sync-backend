@@ -11,18 +11,18 @@ public class CollectionService : ICollectionService
         _collectionRepository = collectionRepository;
     }
 
-    public async Task<IEnumerable<CollectionSummaryRes>> GetAllActiveCollectionsAsync()
+    public async Task<List<CollectionSummaryRes>> GetAllActiveCollectionsAsync(CancellationToken ct = default)
     {
-        var collections = await _collectionRepository.GetAllActiveCollectionsAsync();
+        var collections = await _collectionRepository.GetAllActiveCollectionsAsync(ct);
 
-        return collections.Select(ResDisColMappers.ToCollectionSummaryRes);
+        return collections.Select(c => c.ToCollectionSummaryRes()).ToList();
     }
 
-    public async Task<CollectionDetailRes?> GetCollectionDetailAsync(Guid id)
+    public async Task<CollectionDetailRes?> GetCollectionDetailAsync(Guid id, CancellationToken ct = default)
     {
-        var collection = await _collectionRepository.GetCollectionByIdAsync(id) ?? throw new CollectionNotFoundException(id);
+        var collection = await _collectionRepository.GetCollectionByIdAsync(id, ct) ?? throw new CollectionNotFoundException(id);
 
-        return ResDisColMappers.ToCollectionDetailRes(collection);
+        return collection.ToCollectionDetailRes();
 
     }
 }

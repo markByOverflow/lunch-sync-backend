@@ -4,7 +4,7 @@ namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 
 public interface ICollectionRepository
 {
-    Task<IEnumerable<Collection>> GetAllActiveCollectionsAsync();
-    Task<Collection?> GetCollectionByIdAsync(Guid id);
-    Task<IEnumerable<Guid>> GetAvailableDishIdsInCollectionAsync(Guid collectionId);
+    Task<List<Collection>> GetAllActiveCollectionsAsync(CancellationToken ct = default);
+    Task<Collection?> GetCollectionByIdAsync(Guid id, CancellationToken ct = default);
+    Task<List<Guid>> GetAvailableDishIdsInCollectionAsync(Guid collectionId, CancellationToken ct = default);
 }

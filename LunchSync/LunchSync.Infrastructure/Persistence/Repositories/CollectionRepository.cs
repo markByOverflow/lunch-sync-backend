@@ -14,17 +14,17 @@ public class CollectionRepository : ICollectionRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Collection>> GetAllActiveCollectionsAsync()
+    public async Task<List<Collection>> GetAllActiveCollectionsAsync(CancellationToken ct = default)
     {
         return await _context.Collections
             .Include(c => c.RestaurantCollections) // Load bảng trung gian Collection-Restaurant
                 .ThenInclude(rc => rc.Restaurant) // Load thông tin Restaurant để check Status
             .Where(c => c.Status == CollectionStatus.Active)
             .AsNoTracking() // Tối ưu hiệu năng vì chỉ dùng để hiển thị
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<Collection?> GetCollectionByIdAsync(Guid id)
+    public async Task<Collection?> GetCollectionByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await _context.Collections
             .Include(c => c.RestaurantCollections)
@@ -32,16 +32,16 @@ public class CollectionRepository : ICollectionRepository
                     .ThenInclude(r => r.RestaurantDishes) // Load tiếp bảng trung gian Restaurant-Dish
                         .ThenInclude(rd => rd.Dish)      // Load thông tin Dish cuối cùng để lấy Name
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
-    public async Task<IEnumerable<Guid>> GetAvailableDishIdsInCollectionAsync(Guid collectionId)
+    public async Task<List<Guid>> GetAvailableDishIdsInCollectionAsync(Guid collectionId, CancellationToken ct = default)
     {
         return await _context.RestaurantCollections
             .Where(rc => rc.CollectionId == collectionId)
             .SelectMany(rc => rc.Restaurant.RestaurantDishes)
             .Select(rd => rd.DishId) // Chỉ lấy ID để nhẹ truy vấn
             .Distinct()
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 }
