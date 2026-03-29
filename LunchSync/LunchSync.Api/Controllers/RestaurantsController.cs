@@ -1,0 +1,26 @@
+﻿using LunchSync.Core.Modules.RestaurantsAndDishes;
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace LunchSync.Api.Controllers;
+
+[ApiController]
+[Route("restaurants")]
+public class RestaurantsController : ControllerBase
+{
+    private readonly IRestaurantService _restaurantService;
+
+    public RestaurantsController(IRestaurantService restaurantService)
+    {
+        _restaurantService = restaurantService;
+    }
+
+    // GET /restaurants/{id}
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(RestaurantDetailRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRestaurantById(Guid id, CancellationToken ct)
+    {
+        var result = await _restaurantService.GetRestaurantWithDishesAsync(id, ct);
+        return Ok(result);
+    }
+}
