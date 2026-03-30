@@ -20,7 +20,6 @@ public class CollectionRepository : ICollectionRepository
             .Include(c => c.RestaurantCollections) // Load bảng trung gian Collection-Restaurant
                 .ThenInclude(rc => rc.Restaurant) // Load thông tin Restaurant để check Status
             .Where(c => c.Status == CollectionStatus.Active)
-            .AsNoTracking() // Tối ưu hiệu năng vì chỉ dùng để hiển thị
             .ToListAsync(ct);
     }
 
@@ -31,7 +30,6 @@ public class CollectionRepository : ICollectionRepository
                 .ThenInclude(rc => rc.Restaurant)
                     .ThenInclude(r => r.RestaurantDishes) // Load tiếp bảng trung gian Restaurant-Dish
                         .ThenInclude(rd => rd.Dish)      // Load thông tin Dish cuối cùng để lấy Name
-            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
