@@ -3,6 +3,7 @@ using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Repositories;
 using LunchSync.Core.Modules.Sessions;
 using LunchSync.Infrastructure.Persistence;
+using LunchSync.Infrastructure.Persistence.Caching;
 using LunchSync.Infrastructure.Persistence.Repositories;
 
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +45,8 @@ public static class DependencyInjection
 
         // ── Caching ──
         //services.AddSingleton<IDishProfileCache, InMemoryDishProfileCache>();
-
+        services.AddDistributedMemoryCache();
+        services.AddScoped<ISessionCache, SessionCache>();
         // ── Auth (Cognito) ──
         //services.AddScoped<ICognitoAuthProvider, CognitoAuthProvider>();
 
