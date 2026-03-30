@@ -1,4 +1,4 @@
-﻿using LunchSync.Core.Common.Abstractions;
+using LunchSync.Core.Common.Abstractions;
 using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Auth.Entities;
 
@@ -11,6 +11,8 @@ public class Submission : BaseEntity
     public string Address { get; set; } = null!;
     public string? GoogleMapsUrl { get; set; }
     public PriceTier? PriceTier { get; set; }
+
+    // Giu ten Notes de khop voi column "notes" da co san trong schema.
     public string? Notes { get; set; }
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
     public Guid? ReviewedBy { get; set; }

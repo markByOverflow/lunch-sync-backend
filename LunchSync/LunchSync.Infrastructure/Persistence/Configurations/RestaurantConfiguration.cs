@@ -1,6 +1,5 @@
-﻿using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

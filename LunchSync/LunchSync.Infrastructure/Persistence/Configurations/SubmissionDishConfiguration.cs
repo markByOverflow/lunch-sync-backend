@@ -1,5 +1,4 @@
-﻿using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
-
+using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +10,7 @@ public class SubmissionDishConfiguration : IEntityTypeConfiguration<SubmissionDi
     {
         builder.ToTable("submission_dishes");
 
+        // Composite key de moi mon trong mot submission chi xuat hien mot lan.
         builder.HasKey(sd => new { sd.SubmissionId, sd.DishId });
 
         builder.Property(sd => sd.SubmissionId)

@@ -1,7 +1,6 @@
-﻿using LunchSync.Core;
+using LunchSync.Core;
 using LunchSync.Infrastructure;
 using LunchSync.Api.Middleware;
-
 using Microsoft.OpenApi.Models;
 
 namespace LunchSync.Api
@@ -45,6 +44,7 @@ namespace LunchSync.Api
 
             app.UseHttpsRedirection();
 
+            // Gom loi domain/unhandled ve mot format response thong nhat.
             app.UseGlobalExceptionHandler();
 
             app.UseAuthorization();

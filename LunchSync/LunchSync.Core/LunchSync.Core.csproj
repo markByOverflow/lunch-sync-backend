@@ -10,7 +10,7 @@
     <Folder Include="Modules\Admin\" />
     <Folder Include="Modules\Auth\Entities\" />
     <Folder Include="Modules\Sessions\Entities\" />
-    <Folder Include="Modules\VotingAndScoring\" />
+    <Folder Include="Modules\VotingAndScoring\Entities\" />
   </ItemGroup>
 
   <ItemGroup>

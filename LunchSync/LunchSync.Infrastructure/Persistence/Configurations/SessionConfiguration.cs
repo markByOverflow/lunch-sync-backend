@@ -1,6 +1,5 @@
-﻿using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Sessions.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,9 +11,10 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
     {
         builder.ToTable("sessions");
         builder.HasKey(e => e.Id);
+
         builder.Property(s => s.Id)
-              .HasColumnName("id")
-              .HasDefaultValueSql("gen_random_uuid()");
+               .HasColumnName("id")
+               .HasDefaultValueSql("gen_random_uuid()");
 
         builder.Property(s => s.Pin)
                .HasColumnName("pin")
@@ -84,6 +84,12 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(s => s.ExpiresAt)
                .HasColumnName("expires_at")
                .HasColumnType("timestamp with time zone");
+
+        // Session co nhieu participant; xoa session thi xoa participant di kem.
+        builder.HasMany(s => s.Participants)
+               .WithOne(p => p.Session)
+               .HasForeignKey(p => p.SessionId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(s => s.Host)
                .WithMany()

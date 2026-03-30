@@ -1,9 +1,9 @@
-﻿using LunchSync.Core.Common.Interfaces;
+using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth.Entities;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
 using LunchSync.Core.Modules.Sessions.Entities;
-
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace LunchSync.Infrastructure.Persistence;
 
@@ -12,6 +12,7 @@ public class AppDbContext : DbContext, IUnitOfWork
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
+
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<Participant> Participants => Set<Participant>();
     public DbSet<User> Users => Set<User>();
@@ -24,7 +25,8 @@ public class AppDbContext : DbContext, IUnitOfWork
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-    }
 
+        // Apply tat ca configuration trong Infrastructure de tranh map thieu khi merge.
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
 }

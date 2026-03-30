@@ -1,8 +1,8 @@
-﻿namespace LunchSync.Core.Common.Enums
+namespace LunchSync.Core.Common.Enums
 {
     public enum RestaurantStatus
     {
-        Active = 0,
+        Active = 0, 
         InActive = 1
     }
 }

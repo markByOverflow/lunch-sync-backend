@@ -1,6 +1,5 @@
-﻿using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -61,18 +60,13 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
                .HasColumnType("timestamp with time zone")
                .HasDefaultValueSql("NOW()");
 
-        // user_id -> users(id): người submit
+        // user_id tro toi nguoi submit.
         builder.HasOne(s => s.User)
                .WithMany(u => u.Submissions)
                .HasForeignKey(s => s.UserId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        // reviewed_by -> users(id): admin duyệt, nullable
-        builder.HasOne(s => s.User)
-               .WithMany()
-               .HasForeignKey(s => s.ReviewedBy)
-               .IsRequired(false)
-               .OnDelete(DeleteBehavior.SetNull);
+        // reviewed_by hien chi luu scalar id nguoi duyet de tranh dung chung navigation User.
 
         builder.HasIndex(s => s.Status)
                .HasDatabaseName("idx_submissions_status");

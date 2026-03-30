@@ -1,6 +1,5 @@
-﻿using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Auth.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,10 +9,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        // 1. Map tên bảng
         builder.ToTable("users");
 
-        // 2. Khóa chính
         builder.HasKey(u => u.Id);
 
         builder.Property(u => u.Id)
@@ -42,7 +39,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Role)
                .HasColumnName("role")
                .HasConversion<string>()
-               .HasDefaultValue(UserRole.Host);
+               // Default role sau rebase chi con User/Admin.
+               .HasDefaultValue(UserRole.User);
         builder.HasIndex(u => u.Role).HasDatabaseName("idx_users_role");
 
         builder.Property(u => u.IsActive)
@@ -54,6 +52,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                .HasColumnName("created_at")
                .HasColumnType("timestamp with time zone")
                .HasDefaultValueSql("NOW()");
-
     }
 }

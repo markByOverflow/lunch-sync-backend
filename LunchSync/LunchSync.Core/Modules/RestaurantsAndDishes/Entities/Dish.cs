@@ -1,11 +1,10 @@
-﻿using LunchSync.Core.Common.Abstractions;
+using LunchSync.Core.Common.Abstractions;
 using LunchSync.Core.Common.ValueObjects;
 
 namespace LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
 
 public class Dish : BaseEntity
 {
-
     public string Name { get; set; } = null!;
     public string Category { get; set; } = null!;
     public DishProfile Profile { get; set; } = new();
@@ -15,5 +14,4 @@ public class Dish : BaseEntity
     // Navigation Property
     public ICollection<RestaurantDish> RestaurantDishes { get; set; } = new List<RestaurantDish>();
     public ICollection<SubmissionDish> SubmissionDishes { get; set; } = new List<SubmissionDish>();
-
 }

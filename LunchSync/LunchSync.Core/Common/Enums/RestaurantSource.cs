@@ -1,8 +1,8 @@
-﻿namespace LunchSync.Core.Common.Enums
+namespace LunchSync.Core.Common.Enums
 {
     public enum RestaurantSource
     {
-        Admin = 0,
+        Admin = 0, 
         Crowdsource = 1
     }
 }

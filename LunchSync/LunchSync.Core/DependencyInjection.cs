@@ -1,6 +1,8 @@
-﻿using LunchSync.Core.Modules.RestaurantsAndDishes;
+using LunchSync.Core.Modules.Admin;
+using LunchSync.Core.Modules.Auth;
+using LunchSync.Core.Modules.Auth.Interfaces;
+using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.Sessions;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LunchSync.Core
@@ -9,24 +11,12 @@ namespace LunchSync.Core
     {
         public static IServiceCollection AddCore(this IServiceCollection services)
         {
-            // Auth
-            //services.AddScoped<IAuthService, AuthService>();
-
-            // Sessions
+            // Dang ky business service theo module de controller chi phu thuoc interface.
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ISessionService, SessionService>();
-            //services.AddScoped<IResultsService, ResultsService>();
-
-            // Voting & Scoring
-            //services.AddScoped<IVotingService, VotingService>();
-            //services.AddScoped<SessionScoringService>();    // orchestrator
-            //services.AddSingleton<ScoringEngine>();         // stateless math — singleton OK
-
-            // Restaurants & Dishes
             services.AddScoped<ICollectionService, CollectionService>();
-            //services.AddScoped<ISubmissionService, SubmissionService>();
+            services.AddScoped<IAdminService, AdminService>();
 
-            // Admin
-            //services.AddScoped<IAdminService, AdminService>();
             return services;
         }
     }

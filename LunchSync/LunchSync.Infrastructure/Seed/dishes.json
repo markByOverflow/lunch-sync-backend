@@ -1,0 +1,1192 @@
+[
+    {
+        "id_dish": "16e5af8e-71b8-4566-a6c4-9990ed446211",
+        "name_dish": "Cơm tấm",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.5,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.7,
+            "spicy": -0.2,
+            "texture_complexity": 0.6,
+            "time_required": -0.5,
+            "novelty": -0.9,
+            "healthy": -0.2,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "78ec3239-e78c-4cc9-a783-a7600896fe29",
+        "name_dish": "Cơm gà",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.6,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.5,
+            "spicy": -0.5,
+            "texture_complexity": 0.5,
+            "time_required": -0.5,
+            "novelty": -0.8,
+            "healthy": -0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+        "name_dish": "Cơm chiên",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.8,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.6,
+            "spicy": -0.3,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": -0.9,
+            "healthy": -0.6,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "106485fb-378b-4d80-8e78-7704c8bdb170",
+        "name_dish": "Cơm văn phòng",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.4,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.4,
+            "spicy": -0.5,
+            "texture_complexity": 0.3,
+            "time_required": -0.7,
+            "novelty": -1.0,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "c7a79da3-2a13-41c8-bd21-ec467f5b17a7",
+        "name_dish": "Cơm sườn nướng",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.6,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.8,
+            "spicy": -0.2,
+            "texture_complexity": 0.7,
+            "time_required": -0.5,
+            "novelty": -0.8,
+            "healthy": -0.3,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "e7b0a2d9-2581-4113-a931-f39f08dbe02b",
+        "name_dish": "Cơm rang dưa bò",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.8,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.7,
+            "spicy": -0.2,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": -0.6,
+            "healthy": -0.4,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "91e20ce1-c018-4d5c-8b78-a093f1440548",
+        "name_dish": "Cơm cháy chạo tôm",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.5,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.6,
+            "spicy": -0.4,
+            "texture_complexity": 0.9,
+            "time_required": -0.3,
+            "novelty": -0.4,
+            "healthy": -0.3,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "8602edd9-4c07-41a3-ae02-742f16c7bc04",
+        "name_dish": "Cơm niêu",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.9,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.5,
+            "spicy": -0.5,
+            "texture_complexity": 0.8,
+            "time_required": 0.4,
+            "novelty": -0.3,
+            "healthy": 0.1,
+            "communal": 0.6
+        }
+    },
+    {
+        "id_dish": "292bd453-6529-4274-b9b8-af4fed8ea731",
+        "name_dish": "Cơm hến",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.6,
+            "temperature": 0.2,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.8,
+            "spicy": 0.7,
+            "texture_complexity": 0.7,
+            "time_required": -0.5,
+            "novelty": -0.2,
+            "healthy": 0.2,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "9d2f9baf-50ee-4c2b-9103-2da4e9df236e",
+        "name_dish": "Cơm tay cầm",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.9,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.6,
+            "spicy": -0.3,
+            "texture_complexity": 0.5,
+            "time_required": 0.2,
+            "novelty": -0.2,
+            "healthy": 0.1,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "621dc429-b703-45f5-8baa-829029057a3f",
+        "name_dish": "Cơm trộn Hàn Quốc",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -0.7,
+            "temperature": 0.6,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.8,
+            "spicy": 0.6,
+            "texture_complexity": 0.6,
+            "time_required": -0.3,
+            "novelty": -0.1,
+            "healthy": 0.3,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "ab925aef-15b7-4b60-a20e-8ced7dd01009",
+        "name_dish": "Kimbap",
+        "category_dish": "Cơm",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": -0.3,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.3,
+            "spicy": -0.8,
+            "texture_complexity": 0.4,
+            "time_required": -0.8,
+            "novelty": -0.4,
+            "healthy": 0.4,
+            "communal": -0.5
+        }
+    },
+    {
+        "id_dish": "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7",
+        "name_dish": "Phở bò",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.1,
+            "flavor_intensity": 0.6,
+            "spicy": -0.3,
+            "texture_complexity": 0.4,
+            "time_required": 0.2,
+            "novelty": -0.9,
+            "healthy": 0.3,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "e73c65f0-4346-4d07-8ca1-5816e9b2883d",
+        "name_dish": "Phở gà",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.1,
+            "flavor_intensity": 0.4,
+            "spicy": -0.5,
+            "texture_complexity": 0.3,
+            "time_required": 0.1,
+            "novelty": -0.9,
+            "healthy": 0.5,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee",
+        "name_dish": "Bún bò Huế",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.8,
+            "temperature": 0.9,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.9,
+            "spicy": 0.7,
+            "texture_complexity": 0.6,
+            "time_required": 0.3,
+            "novelty": -0.3,
+            "healthy": 0.1,
+            "communal": -0.7
+        }
+    },
+    {
+        "id_dish": "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+        "name_dish": "Bún riêu",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.7,
+            "spicy": -0.2,
+            "texture_complexity": 0.5,
+            "time_required": 0.1,
+            "novelty": -0.7,
+            "healthy": 0.2,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "b9f1fc61-e4cc-44c3-a7dd-db3a6ca9b3f9",
+        "name_dish": "Bún mọc",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.3,
+            "spicy": -0.6,
+            "texture_complexity": 0.4,
+            "time_required": 0.1,
+            "novelty": -0.8,
+            "healthy": 0.4,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "9549caee-2a3e-47c4-b084-d5e92db79ad6",
+        "name_dish": "Bún cá",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.5,
+            "spicy": -0.3,
+            "texture_complexity": 0.6,
+            "time_required": 0.1,
+            "novelty": -0.5,
+            "healthy": 0.4,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "20342cca-3bf5-4f5b-9229-2ec1cbb59957",
+        "name_dish": "Mì Quảng",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.2,
+            "temperature": 0.6,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.8,
+            "spicy": 0.3,
+            "texture_complexity": 0.7,
+            "time_required": -0.2,
+            "novelty": -0.4,
+            "healthy": 0.2,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "73571140-b87e-48c5-985c-fb4e2c35e0b7",
+        "name_dish": "Cao lầu",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.1,
+            "temperature": 0.5,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.7,
+            "spicy": 0.2,
+            "texture_complexity": 0.8,
+            "time_required": -0.2,
+            "novelty": -0.3,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "8d91a500-a03f-4d94-b83c-c3eef2173689",
+        "name_dish": "Hủ tiếu Nam Vang",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.8,
+            "temperature": 0.8,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.6,
+            "spicy": -0.2,
+            "texture_complexity": 0.5,
+            "time_required": 0.1,
+            "novelty": -0.7,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "8e740ae4-24c0-495a-937e-e1da5de60e09",
+        "name_dish": "Hủ tiếu Mỹ Tho",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.8,
+            "temperature": 0.8,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.5,
+            "spicy": -0.2,
+            "texture_complexity": 0.6,
+            "time_required": 0.1,
+            "novelty": -0.6,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+        "name_dish": "Bánh canh",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.5,
+            "spicy": -0.4,
+            "texture_complexity": 0.2,
+            "time_required": 0.1,
+            "novelty": -0.6,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "80fa80cd-a642-4877-8a91-100e1f745fdd",
+        "name_dish": "Mì vằn thắn",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.5,
+            "spicy": -0.5,
+            "texture_complexity": 0.6,
+            "time_required": 0.1,
+            "novelty": -0.6,
+            "healthy": 0.2,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+        "name_dish": "Bún thịt nướng",
+        "category_dish": "Bún khô/trộn",
+        "profile_dish": {
+            "soupy": -0.7,
+            "temperature": 0.2,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.8,
+            "spicy": 0.1,
+            "texture_complexity": 0.7,
+            "time_required": -0.3,
+            "novelty": -0.7,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "d83ed636-2589-4ae3-8dfa-78e509044b76",
+        "name_dish": "Bún chả",
+        "category_dish": "Bún khô/trộn",
+        "profile_dish": {
+            "soupy": 0.3,
+            "temperature": 0.6,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.8,
+            "spicy": -0.1,
+            "texture_complexity": 0.6,
+            "time_required": 0.2,
+            "novelty": -0.6,
+            "healthy": -0.1,
+            "communal": -0.4
+        }
+    },
+    {
+        "id_dish": "2eba9e97-c17f-4460-b4d0-ae8c947e0699",
+        "name_dish": "Bún đậu mắm tôm",
+        "category_dish": "Bún khô/trộn",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": -0.2,
+            "heaviness": 0.8,
+            "flavor_intensity": 1.0,
+            "spicy": 0.1,
+            "texture_complexity": 0.8,
+            "time_required": 0.3,
+            "novelty": -0.5,
+            "healthy": -0.3,
+            "communal": 0.7
+        }
+    },
+    {
+        "id_dish": "251c81df-c444-47db-a0e9-ca7fe1f2e2b8",
+        "name_dish": "Bún nem",
+        "category_dish": "Bún khô/trộn",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.4,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.7,
+            "spicy": -0.2,
+            "texture_complexity": 0.9,
+            "time_required": -0.2,
+            "novelty": -0.6,
+            "healthy": -0.4,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "8a824fbd-97d7-4dc0-b78e-30c0f3933f1f",
+        "name_dish": "Miến trộn",
+        "category_dish": "Bún khô/trộn",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.3,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.6,
+            "spicy": -0.3,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": -0.5,
+            "healthy": 0.3,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "4c8c66bb-a646-4739-bb4f-a8ca50381057",
+        "name_dish": "Bún mắm (nước)",
+        "category_dish": "Phở & Bún nước",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.8,
+            "flavor_intensity": 1.0,
+            "spicy": 0.4,
+            "texture_complexity": 0.6,
+            "time_required": 0.3,
+            "novelty": -0.2,
+            "healthy": -0.2,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "3b26d250-6614-42e3-a1ea-4285a8cc7c39",
+        "name_dish": "Bánh mì thịt",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.3,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.6,
+            "spicy": 0.3,
+            "texture_complexity": 0.9,
+            "time_required": -0.9,
+            "novelty": -0.9,
+            "healthy": -0.1,
+            "communal": -1.0
+        }
+    },
+    {
+        "id_dish": "d0190fa4-51b4-420e-8386-ef4241a1b562",
+        "name_dish": "Bánh cuốn",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -0.6,
+            "temperature": 0.5,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.4,
+            "spicy": -0.6,
+            "texture_complexity": -0.5,
+            "time_required": -0.3,
+            "novelty": -0.7,
+            "healthy": 0.4,
+            "communal": -0.7
+        }
+    },
+    {
+        "id_dish": "5a999130-ec3e-4f47-8e35-b10aaf0d5636",
+        "name_dish": "Bánh xèo",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.8,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.6,
+            "spicy": -0.2,
+            "texture_complexity": 0.9,
+            "time_required": 0.2,
+            "novelty": -0.5,
+            "healthy": -0.3,
+            "communal": 0.4
+        }
+    },
+    {
+        "id_dish": "eabb661c-ac0b-4a83-b083-efe68df3b775",
+        "name_dish": "Bánh tráng trộn",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": -0.1,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.9,
+            "spicy": 0.7,
+            "texture_complexity": 0.8,
+            "time_required": -0.5,
+            "novelty": -0.4,
+            "healthy": -0.5,
+            "communal": 0.3
+        }
+    },
+    {
+        "id_dish": "73245843-c77b-4453-b4a2-0e4c3085b926",
+        "name_dish": "Bánh ướt",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -0.7,
+            "temperature": 0.2,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.4,
+            "spicy": -0.6,
+            "texture_complexity": -0.6,
+            "time_required": -0.4,
+            "novelty": -0.7,
+            "healthy": 0.3,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "be3e9638-613b-41e1-af0f-a26da15210a6",
+        "name_dish": "Bánh khọt",
+        "category_dish": "Bánh",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.7,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.6,
+            "spicy": -0.2,
+            "texture_complexity": 0.8,
+            "time_required": -0.1,
+            "novelty": -0.4,
+            "healthy": -0.3,
+            "communal": 0.4
+        }
+    },
+    {
+        "id_dish": "ff487652-b943-4107-ae11-3d0d19f2a6d5",
+        "name_dish": "Cháo lòng",
+        "category_dish": "Cháo & Súp",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.7,
+            "spicy": 0.1,
+            "texture_complexity": 0.3,
+            "time_required": 0.1,
+            "novelty": -0.7,
+            "healthy": -0.3,
+            "communal": -0.6
+        }
+    },
+    {
+        "id_dish": "4ad88b69-c42d-4a95-876b-1c27fc3522c4",
+        "name_dish": "Cháo sườn",
+        "category_dish": "Cháo & Súp",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.4,
+            "spicy": -0.7,
+            "texture_complexity": -0.8,
+            "time_required": -0.2,
+            "novelty": -0.8,
+            "healthy": 0.2,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "883b5062-1a42-48eb-820f-e2fc57c47ce4",
+        "name_dish": "Súp nui",
+        "category_dish": "Cháo & Súp",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.3,
+            "spicy": -0.8,
+            "texture_complexity": -0.2,
+            "time_required": -0.3,
+            "novelty": -0.5,
+            "healthy": 0.3,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "e734405a-8833-4ea6-8beb-5980dc7ea101",
+        "name_dish": "Cháo vịt",
+        "category_dish": "Cháo & Súp",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.8,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.6,
+            "spicy": 0.2,
+            "texture_complexity": 0.2,
+            "time_required": 0.2,
+            "novelty": -0.6,
+            "healthy": 0.3,
+            "communal": -0.5
+        }
+    },
+    {
+        "id_dish": "59e826b6-7c03-45fc-a22e-4679abfc326f",
+        "name_dish": "Xôi",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.5,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.4,
+            "spicy": -0.5,
+            "texture_complexity": 0.4,
+            "time_required": -0.8,
+            "novelty": -0.9,
+            "healthy": -0.2,
+            "communal": -1.0
+        }
+    },
+    {
+        "id_dish": "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+        "name_dish": "Gỏi cuốn",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": -0.5,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.4,
+            "spicy": -0.4,
+            "texture_complexity": 0.5,
+            "time_required": -0.6,
+            "novelty": -0.7,
+            "healthy": 0.8,
+            "communal": -0.3
+        }
+    },
+    {
+        "id_dish": "07e9227f-8ac9-4476-87a1-eebda543fcc5",
+        "name_dish": "Há cảo/Dimsum",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -0.5,
+            "temperature": 0.7,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.4,
+            "spicy": -0.6,
+            "texture_complexity": 0.3,
+            "time_required": -0.2,
+            "novelty": -0.3,
+            "healthy": 0.2,
+            "communal": 0.5
+        }
+    },
+    {
+        "id_dish": "f446bc1c-ec8c-4b73-8473-49a629109cc8",
+        "name_dish": "Hoành thánh",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": 0.8,
+            "temperature": 0.8,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.4,
+            "spicy": -0.6,
+            "texture_complexity": 0.2,
+            "time_required": -0.3,
+            "novelty": -0.6,
+            "healthy": 0.3,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5",
+        "name_dish": "Mì xào",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.6,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.6,
+            "spicy": -0.3,
+            "texture_complexity": 0.5,
+            "time_required": -0.5,
+            "novelty": -0.7,
+            "healthy": -0.4,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "709c205d-e29c-4823-a4ff-5a6a7e6acf0d",
+        "name_dish": "Hủ tiếu xào",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.7,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.7,
+            "spicy": -0.3,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": -0.6,
+            "healthy": -0.3,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "57e4c0f1-f181-4402-9352-96a4acd87194",
+        "name_dish": "Bò lúc lắc",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.8,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.8,
+            "spicy": -0.2,
+            "texture_complexity": 0.5,
+            "time_required": -0.1,
+            "novelty": -0.4,
+            "healthy": -0.2,
+            "communal": 0.3
+        }
+    },
+    {
+        "id_dish": "cb655a47-0295-4c3d-9f03-8fe8309a874b",
+        "name_dish": "Cơm cuộn",
+        "category_dish": "Street food",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": -0.2,
+            "heaviness": 0.5,
+            "flavor_intensity": 0.3,
+            "spicy": -0.7,
+            "texture_complexity": 0.4,
+            "time_required": -0.8,
+            "novelty": -0.4,
+            "healthy": 0.4,
+            "communal": -0.4
+        }
+    },
+    {
+        "id_dish": "8069c41d-65f4-4556-8829-d02e0598f6a5",
+        "name_dish": "Salad bowl",
+        "category_dish": "Healthy",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": -0.8,
+            "heaviness": -0.6,
+            "flavor_intensity": -0.3,
+            "spicy": -0.8,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": 0.1,
+            "healthy": 0.9,
+            "communal": -0.8
+        }
+    },
+    {
+        "id_dish": "e723d181-21dd-4d8a-8824-146a2b0a01fa",
+        "name_dish": "Sandwich",
+        "category_dish": "Healthy",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": -0.4,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.2,
+            "spicy": -0.8,
+            "texture_complexity": 0.3,
+            "time_required": -0.8,
+            "novelty": -0.2,
+            "healthy": 0.4,
+            "communal": -1.0
+        }
+    },
+    {
+        "id_dish": "01a8c921-4a95-4236-9d09-490dce4cc0a4",
+        "name_dish": "Healthy wrap",
+        "category_dish": "Healthy",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": -0.3,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.3,
+            "spicy": -0.7,
+            "texture_complexity": 0.5,
+            "time_required": -0.7,
+            "novelty": 0.2,
+            "healthy": 0.8,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "6c9483a3-ab66-4e56-846e-6b0a2b70957d",
+        "name_dish": "Poke bowl",
+        "category_dish": "Healthy",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": -0.6,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.4,
+            "spicy": -0.4,
+            "texture_complexity": 0.5,
+            "time_required": -0.3,
+            "novelty": 0.6,
+            "healthy": 0.8,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "847bf30e-6845-473a-8b8c-cf039e5b3457",
+        "name_dish": "Cơm gạo lứt",
+        "category_dish": "Healthy",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.4,
+            "heaviness": 0.3,
+            "flavor_intensity": -0.2,
+            "spicy": -0.6,
+            "texture_complexity": 0.6,
+            "time_required": -0.4,
+            "novelty": -0.3,
+            "healthy": 0.9,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "bc8b923a-64ea-4f59-bf60-a1306eb1060c",
+        "name_dish": "Lẩu mini",
+        "category_dish": "Chia sẻ",
+        "profile_dish": {
+            "soupy": 1.0,
+            "temperature": 1.0,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.7,
+            "spicy": 0.4,
+            "texture_complexity": 0.5,
+            "time_required": 0.6,
+            "novelty": -0.1,
+            "healthy": 0.2,
+            "communal": 0.3
+        }
+    },
+    {
+        "id_dish": "96976e89-fe12-4bf4-8c57-eedc92e988b0",
+        "name_dish": "Nướng BBQ",
+        "category_dish": "Chia sẻ",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 1.0,
+            "heaviness": 0.9,
+            "flavor_intensity": 0.9,
+            "spicy": 0.3,
+            "texture_complexity": 0.8,
+            "time_required": 0.9,
+            "novelty": 0.1,
+            "healthy": -0.6,
+            "communal": 0.9
+        }
+    },
+    {
+        "id_dish": "29f6563e-49c6-4dfe-9477-69f2f4708cc5",
+        "name_dish": "Set cơm Nhật",
+        "category_dish": "Chia sẻ",
+        "profile_dish": {
+            "soupy": -0.5,
+            "temperature": 0.4,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.3,
+            "spicy": -0.7,
+            "texture_complexity": 0.5,
+            "time_required": 0.3,
+            "novelty": 0.2,
+            "healthy": 0.6,
+            "communal": -0.7
+        }
+    },
+    {
+        "id_dish": "4a8f90a1-c4ff-4ae8-b929-adad2e824712",
+        "name_dish": "Mì cay Hàn Quốc",
+        "category_dish": "Chia sẻ",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 1.0,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.9,
+            "spicy": 1.0,
+            "texture_complexity": 0.6,
+            "time_required": 0.2,
+            "novelty": 0.1,
+            "healthy": -0.3,
+            "communal": -0.5
+        }
+    },
+    {
+        "id_dish": "3fea11d1-ecad-4ba5-b10b-df20442cc3e5",
+        "name_dish": "Tokbokki",
+        "category_dish": "Chia sẻ",
+        "profile_dish": {
+            "soupy": 0.4,
+            "temperature": 0.9,
+            "heaviness": 0.9,
+            "flavor_intensity": 0.9,
+            "spicy": 0.8,
+            "texture_complexity": 0.8,
+            "time_required": 0.4,
+            "novelty": 0.3,
+            "healthy": -0.5,
+            "communal": 0.7
+        }
+    },
+    {
+        "id_dish": "ea268757-8920-440f-a8b6-05bf62bac37a",
+        "name_dish": "Pasta / Mì Ý",
+        "category_dish": "Fusion",
+        "profile_dish": {
+            "soupy": -0.4,
+            "temperature": 0.6,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.6,
+            "spicy": -0.5,
+            "texture_complexity": 0.4,
+            "time_required": 0.3,
+            "novelty": 0.4,
+            "healthy": -0.2,
+            "communal": -0.6
+        }
+    },
+    {
+        "id_dish": "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+        "name_dish": "Burger",
+        "category_dish": "Fusion",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.6,
+            "heaviness": 0.9,
+            "flavor_intensity": 0.8,
+            "spicy": -0.4,
+            "texture_complexity": 0.5,
+            "time_required": -0.5,
+            "novelty": 0.3,
+            "healthy": -0.7,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "ca787209-2543-43d2-bfe5-e4a40aa7f32d",
+        "name_dish": "Pizza",
+        "category_dish": "Fusion",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.7,
+            "heaviness": 0.9,
+            "flavor_intensity": 0.7,
+            "spicy": -0.5,
+            "texture_complexity": 0.6,
+            "time_required": 0.2,
+            "novelty": 0.2,
+            "healthy": -0.6,
+            "communal": 0.8
+        }
+    },
+    {
+        "id_dish": "87a9eaaf-d17f-4c5d-9441-5a157eb1cbbf",
+        "name_dish": "Taco/Burrito",
+        "category_dish": "Fusion",
+        "profile_dish": {
+            "soupy": -1.0,
+            "temperature": 0.4,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.8,
+            "spicy": 0.4,
+            "texture_complexity": 0.7,
+            "time_required": -0.4,
+            "novelty": 0.7,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "60fc35fd-e246-409b-8296-2ca71c89213a",
+        "name_dish": "Pad Thai",
+        "category_dish": "Fusion",
+        "profile_dish": {
+            "soupy": -0.7,
+            "temperature": 0.7,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.8,
+            "spicy": 0.4,
+            "texture_complexity": 0.6,
+            "time_required": 0.1,
+            "novelty": 0.4,
+            "healthy": 0.2,
+            "communal": -0.5
+        }
+    },
+    {
+        "id_dish": "98f78734-5a0c-4404-810d-aad34f4e3a2e",
+        "name_dish": "Bò kho",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": 0.7,
+            "temperature": 0.9,
+            "heaviness": 0.8,
+            "flavor_intensity": 0.9,
+            "spicy": 0.3,
+            "texture_complexity": 0.5,
+            "time_required": 0.2,
+            "novelty": -0.3,
+            "healthy": 0.1,
+            "communal": -0.4
+        }
+    },
+    {
+        "id_dish": "ee6e1744-f0eb-4c79-802c-6fe799ad71c9",
+        "name_dish": "Hủ tiếu gõ",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.4,
+            "spicy": -0.3,
+            "texture_complexity": 0.4,
+            "time_required": -0.5,
+            "novelty": -0.6,
+            "healthy": 0.1,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "cc3b4294-c634-45a9-8254-302c23004dcd",
+        "name_dish": "Bánh bèo",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": -0.6,
+            "temperature": 0.3,
+            "heaviness": 0.4,
+            "flavor_intensity": 0.5,
+            "spicy": -0.4,
+            "texture_complexity": -0.3,
+            "time_required": -0.2,
+            "novelty": -0.1,
+            "healthy": 0.2,
+            "communal": 0.4
+        }
+    },
+    {
+        "id_dish": "84b34a8f-ee04-4ab2-98dc-9abb507b9d35",
+        "name_dish": "Bún chả cá",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": 0.9,
+            "temperature": 0.9,
+            "heaviness": 0.3,
+            "flavor_intensity": 0.6,
+            "spicy": -0.2,
+            "texture_complexity": 0.7,
+            "time_required": 0.1,
+            "novelty": -0.2,
+            "healthy": 0.5,
+            "communal": -0.9
+        }
+    },
+    {
+        "id_dish": "4b1064cb-53e8-4ae0-88d5-7761e1711efe",
+        "name_dish": "Nem nướng Nha Trang",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": -0.9,
+            "temperature": 0.4,
+            "heaviness": 0.7,
+            "flavor_intensity": 0.8,
+            "spicy": 0.2,
+            "texture_complexity": 0.6,
+            "time_required": 0.4,
+            "novelty": 0.1,
+            "healthy": 0.3,
+            "communal": 0.8
+        }
+    },
+    {
+        "id_dish": "492149f1-31c2-4a1e-a2b8-3a561ef3a646",
+        "name_dish": "Gỏi khô bò",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": -0.1,
+            "heaviness": 0.2,
+            "flavor_intensity": 0.8,
+            "spicy": 0.6,
+            "texture_complexity": 0.7,
+            "time_required": -0.4,
+            "novelty": -0.3,
+            "healthy": -0.1,
+            "communal": 0.2
+        }
+    },
+    {
+        "id_dish": "3da9446a-5ad8-457b-94d9-4db3c3332444",
+        "name_dish": "Cơm hấp lá sen",
+        "category_dish": "Đặc sản vùng",
+        "profile_dish": {
+            "soupy": -0.8,
+            "temperature": 0.8,
+            "heaviness": 0.6,
+            "flavor_intensity": 0.4,
+            "spicy": -0.6,
+            "texture_complexity": 0.5,
+            "time_required": 0.4,
+            "novelty": 0.3,
+            "healthy": 0.4,
+            "communal": 0.3
+        }
+    }
+]
