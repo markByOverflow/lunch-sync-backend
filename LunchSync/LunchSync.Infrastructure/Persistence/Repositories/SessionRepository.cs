@@ -21,14 +21,18 @@ public class SessionRepository : ISessionRepository
     {
         return await _context.Sessions
             .AsNoTracking()
-            .Include(s => s.Participants) // Load danh sách người chơi
+            .Include(s => s.Participants)
+            .Include(s => s.Collection)
+            .Include(s => s.Restaurant)
+            .Include(s => s.Host)
             .FirstOrDefaultAsync(s => s.Id == sessionId, ct);
     }
     public async Task<Session?> GetLastSessionByHostIdAsync(Guid hostId, CancellationToken ct = default)
     {
         return await _context.Sessions
-            .AsNoTracking()
             .Where(s => s.HostId == hostId)
+            .Include(s => s.Collection)
+            .Include(s => s.Restaurant)
             .OrderByDescending(s => s.CreatedAt)
             .FirstOrDefaultAsync(ct);
     }
@@ -39,11 +43,19 @@ public class SessionRepository : ISessionRepository
         return session.Id;
     }
 
+    public async Task SaveParticipantAsync(Participant participant)
+    {
+        _context.Participants.Add(participant);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<Session?> GetActiveSessionByPinAsync(string pin, CancellationToken ct = default)
     {
         return await _context.Sessions
-            .AsNoTracking()
             .Include(s => s.Participants)
+            .Include(s => s.Collection)
+            .Include(s => s.Restaurant)
+            .Include(s => s.Host)
             .Where(s => s.Pin == pin && s.Status != SessionStatus.Done
                 && s.Status != SessionStatus.Cancelled)
             .FirstOrDefaultAsync(ct);

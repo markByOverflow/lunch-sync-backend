@@ -11,6 +11,7 @@ public interface ISessionRepository
 
     // Read active (dùng cho flow đang chạy)
     Task<Session?> GetActiveSessionByPinAsync(string pin, CancellationToken ct = default);
+    Task SaveParticipantAsync(Participant participant);
 
     // Read history (đã done/cancelled)
     Task<Session?> GetSessionByIdAsync(Guid sessionId, CancellationToken ct = default);
