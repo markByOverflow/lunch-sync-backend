@@ -4,6 +4,8 @@ using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Sessions.Entities;
 using LunchSync.Core.Modules.Sessions;
 
+using System.Linq.Expressions;
+
 namespace LunchSync.Infrastructure.Persistence.Repositories;
 
 public class SessionRepository : ISessionRepository
@@ -36,4 +38,27 @@ public class SessionRepository : ISessionRepository
         await _context.SaveChangesAsync();
         return session.Id;
     }
+
+    public async Task<Session?> GetActiveSessionByPinAsync(string pin, CancellationToken ct = default)
+    {
+        return await _context.Sessions
+            .AsNoTracking()
+            .Include(s => s.Participants)
+            .Where(s => s.Pin == pin && s.Status != SessionStatus.Done)
+            .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task UpdateSessionAsync<TProperty>(Session session, Expression<Func<Session, TProperty>> propertyExpression, TProperty value)
+    {
+        // 1. Gắn object vào Context nếu nó chưa được theo dõi
+        _context.Attach(session);
+
+        // 2. Chỉ định chính xác property nào thay đổi
+        _context.Entry(session).Property(propertyExpression).CurrentValue = value;
+        _context.Entry(session).Property(propertyExpression).IsModified = true;
+
+        // 3. Lưu (SQL chỉ Update đúng cột đó)
+        await _context.SaveChangesAsync();
+    }
+    // CÁCH DÙNG:await UpdateFieldAsync(session, s => s.Status, SessionStatus.Active);
 }
