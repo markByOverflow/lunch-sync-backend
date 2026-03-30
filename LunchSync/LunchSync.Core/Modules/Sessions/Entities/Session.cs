@@ -1,4 +1,6 @@
-﻿using LunchSync.Core.Common.Abstractions;
+﻿using System.Text.Json.Serialization;
+
+using LunchSync.Core.Common.Abstractions;
 using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Auth.Entities;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
@@ -26,8 +28,11 @@ public class Session : BaseEntity
     public DateTime? ExpiresAt { get; set; }
 
     //Navigation
+    [JsonIgnore]
     public User Host { get; set; } = null!;
+    [JsonIgnore]
     public Collection Collection { get; set; } = null!;
+    [JsonIgnore]
     public Restaurant Restaurant { get; set; } = null!;
-    public ICollection<Participant> Participants { get; set; } = new List<Participant>();
+    public List<Participant> Participants { get; set; } = new List<Participant>();
 }

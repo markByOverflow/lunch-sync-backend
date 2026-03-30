@@ -1,4 +1,6 @@
-﻿using LunchSync.Core.Common.Abstractions;
+﻿using System.Text.Json.Serialization;
+
+using LunchSync.Core.Common.Abstractions;
 using LunchSync.Core.Modules.Auth.Entities;
 
 namespace LunchSync.Core.Modules.Sessions.Entities;
@@ -16,6 +18,8 @@ public class Participant : BaseEntity
     public DateTime? VotedAt { get; set; }
 
     //navigation
+    [JsonIgnore]
     public Session Session { get; set; } = null!;
+    [JsonIgnore]
     public User User { get; set; } = null!;
 }
