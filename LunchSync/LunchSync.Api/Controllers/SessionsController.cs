@@ -37,7 +37,8 @@ public class SessionsController : ControllerBase
     public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var result = await _sessionService.JoinSessionAsync(validPin.Value, request, ct);
+        Guid? UserId = null; // Giả sử UserId được lấy từ Token/Identity. Ở đây tạm lấy Guid mẫu.
+        var result = await _sessionService.JoinSessionAsync(UserId, validPin.Value, request, ct);
         return Ok(result);
     }
 
@@ -97,6 +98,7 @@ public class SessionsController : ControllerBase
     // GET: /sessions/history/{sessionId} - Lấy từ DB khi cache/local mất
     [AllowAnonymous]
     [HttpGet("history/{sessionId:guid}")]
+    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId, CancellationToken ct)
     {
         var session = await _sessionService.GetSessionHistoryAsync(sessionId, ct) ?? throw new SessionNotFoundByIdException(sessionId);

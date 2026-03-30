@@ -27,7 +27,8 @@ public static class SessionsMappers
             Participants = session.Participants.Select(p => new ParticipantDto
             {
                 Nickname = p.Nickname,
-                JoinedAt = p.JoinedAt
+                JoinedAt = p.JoinedAt,
+                IsHost = p.UserId == session.HostId,
             }).ToList()
         };
     }
@@ -49,16 +50,17 @@ public static class SessionsMappers
             Pin = session.Pin,
             Status = session.Status.ToString().ToLower(),
             HostName = session.Participants
-                        .FirstOrDefault(p => p.UserId == session.HostId)?
-                        .Nickname ?? "Unknown Host",
-            CollectionName = session.Collection.Name,
+                        .Where(p => p.UserId != Guid.Empty && p.UserId == session.HostId)
+                        .Select(p => p.Nickname)
+                        .FirstOrDefault() ?? "Unknown Host",
+            CollectionName = session.Collection?.Name ?? "Unknown Collection",
             PriceTier = session.PriceTier.ToString(),
             PriceDisplay = session.PriceTier.ToString() + "/phần",
             Participants = session.Participants.Select(p => new ParticipantDto
             {
                 Nickname = p.Nickname,
                 JoinedAt = p.JoinedAt,
-                IsHost = p.UserId != null && p.UserId == session.HostId,
+                IsHost = p.UserId == session.HostId,
             }).ToList(),
             ParticipantCount = session.Participants.Count,
             CreatedAt = session.CreatedAt,
