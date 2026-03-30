@@ -4,7 +4,7 @@ namespace LunchSync.Core.Modules.Sessions;
 
 public interface ISessionRepository
 {
-    Task<Guid> SaveHistoryAsync(Session session);
-    Task<Session?> GetHistoryByIdAsync(Guid sessionId);
-    Task<Session?> GetLastSessionByHostIdAsync(Guid hostId);
+    Task<Guid> SaveSessionAsync(Session session);
+    Task<Session?> GetSessionByIdAsync(Guid sessionId, CancellationToken ct = default);
+    Task<Session?> GetLastSessionByHostIdAsync(Guid hostId, CancellationToken ct = default);
 }

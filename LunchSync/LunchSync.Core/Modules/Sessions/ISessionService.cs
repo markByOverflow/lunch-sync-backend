@@ -9,5 +9,5 @@ public interface ISessionService
     Task<SessionStartRes> StartSessionAsync(string pin, Guid hostId);
     Task CancelSessionAsync(string pin, Guid hostId);
     Task<Session?> GetSessionAsync(string pin);
-    Task<Session?> GetSessionHistoryAsync(Guid sessionId);
+    Task<Session?> GetSessionHistoryAsync(Guid sessionId, CancellationToken ct = default);
 }

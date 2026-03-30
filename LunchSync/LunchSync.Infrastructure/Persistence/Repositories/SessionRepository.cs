@@ -15,22 +15,22 @@ public class SessionRepository : ISessionRepository
         _context = context;
     }
 
-    public async Task<Session?> GetHistoryByIdAsync(Guid sessionId)
+    public async Task<Session?> GetSessionByIdAsync(Guid sessionId, CancellationToken ct = default)
     {
         return await _context.Sessions
             .AsNoTracking()
             .Include(s => s.Participants) // Load danh sách người chơi
-            .FirstOrDefaultAsync(s => s.Id == sessionId);
+            .FirstOrDefaultAsync(s => s.Id == sessionId, ct);
     }
-    public async Task<Session?> GetLastSessionByHostIdAsync(Guid hostId)
+    public async Task<Session?> GetLastSessionByHostIdAsync(Guid hostId, CancellationToken ct = default)
     {
         return await _context.Sessions
             .AsNoTracking()
             .Where(s => s.HostId == hostId)
             .OrderByDescending(s => s.CreatedAt)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(ct);
     }
-    public async Task<Guid> SaveHistoryAsync(Session session)
+    public async Task<Guid> SaveSessionAsync(Session session)
     {
         _context.Sessions.Add(session);
         await _context.SaveChangesAsync();
