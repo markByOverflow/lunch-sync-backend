@@ -2,6 +2,7 @@
 using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Common.ValueObjects;
 using LunchSync.Core.Exceptions;
+using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.Sessions.Entities;
 
 using Microsoft.Extensions.Configuration;
@@ -13,23 +14,22 @@ public class SessionService : ISessionService
     private readonly ISessionCache _cache;
     private readonly ISessionRepository _repository;
     private readonly IConfiguration _configuration;
+    private readonly ICollectionRepository _collectionRepository;
     private const int MaxParticipants = 8;
     private const int MinParticipants = 3;
     private const int DefaultExpiryMinutes = 30;
 
-    public SessionService(ISessionCache cache, ISessionRepository repository, IConfiguration configuration)
+    public SessionService(ISessionCache cache, ISessionRepository repository, IConfiguration configuration, ICollectionRepository collectionRepository)
     {
         _cache = cache;
         _repository = repository;
         _configuration = configuration;
+        _collectionRepository = collectionRepository;
     }
     //command Post => return DTO
     public async Task<CreateSessionRes> CreateSessionAsync(CreateSessionReq request, Guid HostId)
     {
-        //var collection = await _collectionRepository.GetByIdAsync(request.CollectionId);
-        // if (collection == null) throw new BusinessRuleViolationException("Bộ sưu tập không tồn tại.");
-        var collectionName = "";
-
+        var collection = await _collectionRepository.GetCollectionByIdAsync(request.CollectionId) ?? throw new CollectionNotFoundException(request.CollectionId);
         var now = DateTime.UtcNow;
         var sessionId = Guid.NewGuid();
 
@@ -69,19 +69,21 @@ public class SessionService : ISessionService
             Id = Guid.NewGuid(),
             SessionId = session.Id,
             Nickname = request.Nickname,
-            JoinedAt = DateTime.UtcNow
+            JoinedAt = DateTime.UtcNow,
+            UserId = HostId
         };
 
         session.Participants.Add(host);
+        session.Collection = collection;
 
         await _repository.SaveSessionAsync(session);
         await _cache.SetSessionAsync(session);
 
         var baseUrl = _configuration["AppSettings:ClientBaseUrl"];
-        return session.ToCreateSessionRes(collectionName ?? "", baseUrl ?? "");
+        return session.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
 
     }
-    public async Task<JoinRes> JoinSessionAsync(string pin, JoinReq request, CancellationToken ct = default)
+    public async Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default)
     {
         var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? await _repository.GetActiveSessionByPinAsync(pin, ct)
                       ?? throw new SessionNotFoundException(pin);
@@ -96,13 +98,14 @@ public class SessionService : ISessionService
         var participant = new Participant
         {
             Id = Guid.NewGuid(),
+            UserId = userId,
             SessionId = session.Id,
             Nickname = request.Nickname,
             JoinedAt = DateTime.UtcNow
         };
 
         session.Participants.Add(participant);
-
+        await _repository.SaveParticipantAsync(participant);
         await _cache.SetSessionAsync(session, ct);
 
         return participant.ToJoinRes(session);
@@ -142,7 +145,11 @@ public class SessionService : ISessionService
     public async Task<Session?> GetSessionAsync(string pin, CancellationToken ct = default)
     {
         var session = await _cache.GetActiveSessionByPinAsync(pin, ct)
-            ?? await _repository.GetActiveSessionByPinAsync(pin, ct);
+            ?? await _repository.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        if (session.Collection == null)
+        {
+            session.Collection = await _collectionRepository.GetCollectionByIdAsync(session.CollectionId) ?? throw new CollectionNotFoundException(session.CollectionId);
+        }
         return session;
     }
     public async Task<Session?> GetSessionHistoryAsync(Guid sessionId, CancellationToken ct = default)

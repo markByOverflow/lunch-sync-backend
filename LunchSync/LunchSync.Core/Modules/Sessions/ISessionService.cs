@@ -5,7 +5,7 @@ namespace LunchSync.Core.Modules.Sessions;
 public interface ISessionService
 {
     Task<CreateSessionRes> CreateSessionAsync(CreateSessionReq request, Guid HostId);
-    Task<JoinRes> JoinSessionAsync(string pin, JoinReq request, CancellationToken ct = default);
+    Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default);
     Task<SessionStartRes> StartSessionAsync(string pin, Guid hostId, CancellationToken ct = default);
     Task CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default);
     Task<Session?> GetSessionAsync(string pin, CancellationToken ct = default);
