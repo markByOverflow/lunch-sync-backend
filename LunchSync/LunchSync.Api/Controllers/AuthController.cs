@@ -41,6 +41,46 @@ public sealed class AuthController : ControllerBase
             _currentUser.Roles));
     }
 
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterRequest? request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Public register se tao user tren Cognito va tao local user cho app.
+            var response = await _authService.RegisterAsync(
+                request ?? new RegisterRequest(string.Empty, string.Empty, null),
+                cancellationToken);
+            return StatusCode(StatusCodes.Status201Created, response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return ValidationProblem(detail: ex.Message);
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(
+        [FromBody] LoginRequest? request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Login se lay token tu Cognito va dong bo local user neu can.
+            var response = await _authService.LoginAsync(
+                request ?? new LoginRequest(string.Empty, string.Empty),
+                cancellationToken);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return ValidationProblem(detail: ex.Message);
+        }
+    }
+
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpGet("registration-status")]
     public async Task<IActionResult> RegistrationStatus(CancellationToken cancellationToken)
@@ -50,31 +90,6 @@ public sealed class AuthController : ControllerBase
 
         var response = await _authService.GetRegistrationStatusAsync(_currentUser.UserId, cancellationToken);
         return Ok(response);
-    }
-
-    [Authorize(Policy = AuthPolicies.CognitoUser)]
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(
-        [FromBody] RegisterCurrentUserRequest? request,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            // Hien tai register nay chi tao local user tu principal Cognito da co san.
-            var response = await _authService.RegisterCurrentUserAsync(
-                request ?? new RegisterCurrentUserRequest(null),
-                cancellationToken);
-            if (response.CreatedNewUser)
-            {
-                return CreatedAtAction(nameof(RegistrationStatus), response);
-            }
-
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return ValidationProblem(detail: ex.Message);
-        }
     }
 
     [AllowAnonymous]

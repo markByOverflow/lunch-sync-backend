@@ -4,8 +4,26 @@ namespace LunchSync.Core.Modules.Auth;
 
 public static class AuthMappers
 {
-    public static AuthResponse ToAuthResponse(this User user)
+    public static RegisterResponse ToRegisterResponse(this User user, string message)
     {
-        return new AuthResponse(user.Id, user.Email);
+        return new RegisterResponse(
+            user.Id,
+            user.Email,
+            user.FullName,
+            user.Role.ToString().ToLowerInvariant(),
+            message
+        );
+    }
+
+    public static LoginResponse ToLoginResponse(this User user, string accessToken, int expiresIn)
+    {
+        return new LoginResponse(
+            accessToken,
+            expiresIn,
+            user.Id,
+            user.Email,
+            user.FullName,
+            user.Role.ToString().ToLowerInvariant()
+        );
     }
 }

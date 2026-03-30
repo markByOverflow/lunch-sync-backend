@@ -1,5 +1,33 @@
 namespace LunchSync.Core.Modules.Auth;
 
+public sealed record RegisterRequest(
+    string Email,
+    string Password,
+    string? FullName
+);
+
+public sealed record RegisterResponse(
+    Guid UserId,
+    string Email,
+    string? FullName,
+    string Role,
+    string Message
+);
+
+public sealed record LoginRequest(
+    string Email,
+    string Password
+);
+
+public sealed record LoginResponse(
+    string AccessToken,
+    int ExpiresIn,
+    Guid UserId,
+    string Email,
+    string? FullName,
+    string Role
+);
+
 public sealed record CurrentActorResponse(
     string? UserId,
     string? Email,
@@ -13,16 +41,18 @@ public sealed record RegistrationStatusResponse(
     bool IsRegistered
 );
 
-public sealed record RegisterCurrentUserRequest(
-    string? DisplayName
-);
-
-public sealed record RegisterCurrentUserResponse(
-    Guid RegistrationId,
+public sealed record CognitoRegisterResult(
     string CognitoSub,
     string Email,
-    string? FullName,
-    bool CreatedNewUser
+    string? FullName
+);
+
+public sealed record CognitoLoginResult(
+    string AppBearerToken,
+    int ExpiresIn,
+    string CognitoSub,
+    string Email,
+    string? FullName
 );
 
 public sealed record GuestAccessTokenRequest(

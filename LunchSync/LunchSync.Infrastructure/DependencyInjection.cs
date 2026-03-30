@@ -40,7 +40,7 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect(
                 configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false"));
 
-        // Bind auth options mot lan de token service dung chung config.
+        // Bind auth options once so token services va auth provider dung chung config.
         services.Configure<GuestTokenOptions>(
             configuration.GetSection(GuestTokenOptions.SectionName));
 
@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<ICollectionRepository, CollectionRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddHttpClient<ICognitoAuthProvider, CognitoAuthProvider>();
         services.AddScoped<ISessionCache, SessionCache>();
         services.AddScoped<IPinManager, PinManager>();
         services.AddSingleton<IGuestTokenService, GuestTokenService>();

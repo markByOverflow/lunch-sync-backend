@@ -1,4 +1,3 @@
-using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth.Entities;
 using LunchSync.Core.Modules.Auth.Interfaces;
 
@@ -7,12 +6,12 @@ namespace LunchSync.Core.Modules.Auth;
 public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly ICurrentUserService _currentUser;
+    private readonly ICognitoAuthProvider _cognitoAuthProvider;
 
-    public AuthService(IUserRepository userRepository, ICurrentUserService currentUser)
+    public AuthService(IUserRepository userRepository, ICognitoAuthProvider cognitoAuthProvider)
     {
         _userRepository = userRepository;
-        _currentUser = currentUser;
+        _cognitoAuthProvider = cognitoAuthProvider;
     }
 
     public async Task<RegistrationStatusResponse> GetRegistrationStatusAsync(
@@ -25,38 +24,87 @@ public sealed class AuthService : IAuthService
         return new RegistrationStatusResponse(cognitoSub, isRegistered);
     }
 
-    public async Task<RegisterCurrentUserResponse> RegisterCurrentUserAsync(
-        RegisterCurrentUserRequest request,
+    public async Task<RegisterResponse> RegisterAsync(
+        RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
-        // Flow hien tai chua tu dang ky Cognito, chi tao user local tu principal da dang nhap.
-        var cognitoSub = _currentUser.UserId;
-        if (string.IsNullOrWhiteSpace(cognitoSub))
+        // Dang ky qua Cognito truoc, sau do tao ban ghi local cho app.
+        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
         {
-            throw new InvalidOperationException("Authenticated Cognito subject is required.");
+            throw new InvalidOperationException("Email is required.");
         }
 
-        var email = _currentUser.Email;
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(request.Password))
         {
-            throw new InvalidOperationException("Authenticated email claim is required.");
+            throw new InvalidOperationException("Password is required.");
         }
 
-        var existingUser = await _userRepository.GetByCognitoSubAsync(cognitoSub, cancellationToken);
+        var cognitoResult = await _cognitoAuthProvider.RegisterAsync(
+            request with { Email = normalizedEmail },
+            cancellationToken);
+
+        var existingUser = await _userRepository.GetByCognitoSubAsync(cognitoResult.CognitoSub, cancellationToken)
+            ?? await _userRepository.GetByEmailAsync(cognitoResult.Email, cancellationToken);
+
         if (existingUser is not null)
         {
-            return existingUser.ToRegisterResponse(createdNewUser: false);
+            return existingUser.ToRegisterResponse("Dang ky thanh cong.");
         }
 
-        var newUser = new User
+        var createdUser = await _userRepository.AddAsync(new User
         {
-            CognitoSub = cognitoSub,
-            Email = email,
-            FullName = request.DisplayName?.Trim()
-                ?? _currentUser.Name?.Trim()
-        };
+            CognitoSub = cognitoResult.CognitoSub,
+            Email = cognitoResult.Email,
+            FullName = cognitoResult.FullName?.Trim()
+        }, cancellationToken);
 
-        var createdUser = await _userRepository.AddAsync(newUser, cancellationToken);
-        return createdUser.ToRegisterResponse(createdNewUser: true);
+        return createdUser.ToRegisterResponse("Dang ky thanh cong. Vui long xac nhan email neu can.");
+    }
+
+    public async Task<LoginResponse> LoginAsync(
+        LoginRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        // Dang nhap qua Cognito, sau do dong bo local user de session dung duoc.
+        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            throw new InvalidOperationException("Email is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new InvalidOperationException("Password is required.");
+        }
+
+        var cognitoResult = await _cognitoAuthProvider.LoginAsync(
+            request with { Email = normalizedEmail },
+            cancellationToken);
+
+        var user = await _userRepository.GetByCognitoSubAsync(cognitoResult.CognitoSub, cancellationToken)
+            ?? await _userRepository.GetByEmailAsync(cognitoResult.Email, cancellationToken);
+
+        if (user is null)
+        {
+            user = await _userRepository.AddAsync(new User
+            {
+                CognitoSub = cognitoResult.CognitoSub,
+                Email = cognitoResult.Email,
+                FullName = cognitoResult.FullName?.Trim()
+            }, cancellationToken);
+        }
+        else if (!string.Equals(user.CognitoSub, cognitoResult.CognitoSub, StringComparison.Ordinal)
+            || !string.Equals(user.Email, cognitoResult.Email, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(user.FullName, cognitoResult.FullName?.Trim(), StringComparison.Ordinal))
+        {
+            user.CognitoSub = cognitoResult.CognitoSub;
+            user.Email = cognitoResult.Email;
+            user.FullName = cognitoResult.FullName?.Trim();
+            user = await _userRepository.UpdateAsync(user, cancellationToken);
+        }
+
+        // App hien dang xac thuc bang token co day du claim profile cho backend.
+        return user.ToLoginResponse(cognitoResult.AppBearerToken, cognitoResult.ExpiresIn);
     }
 }
