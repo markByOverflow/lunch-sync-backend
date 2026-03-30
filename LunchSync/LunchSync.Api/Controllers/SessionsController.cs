@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LunchSync.Api.Controllers;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/sessions")]
 public class SessionsController : ControllerBase
@@ -20,6 +20,7 @@ public class SessionsController : ControllerBase
 
     // POST: /sessions - Tạo session [Auth: Host]
     [HttpPost]
+    [ProducesResponseType(typeof(CreateSessionRes), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateAsync([FromBody] CreateSessionReq request)
     {
         // Giả sử HostId được lấy từ Token/Identity. Ở đây tạm lấy từ Header hoặc Guid mẫu.
@@ -32,41 +33,44 @@ public class SessionsController : ControllerBase
     // POST: /sessions/{pin}/join - Join session [Public]
     [AllowAnonymous]
     [HttpPost("{pin}/join")]
-    public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request)
+    [ProducesResponseType(typeof(JoinRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var result = await _sessionService.JoinSessionAsync(validPin.Value, request);
+        var result = await _sessionService.JoinSessionAsync(validPin.Value, request, ct);
         return Ok(result);
     }
 
     // POST: /sessions/{pin}/start - Bắt đầu voting [Auth: Host]
     [HttpPost("{pin}/start")]
-    public async Task<IActionResult> StartAsync([FromRoute] string pin)
+    [ProducesResponseType(typeof(SessionStartRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> StartAsync([FromRoute] string pin, CancellationToken ct)
     {
         // Giả sử HostId được lấy từ Token/Identity. Ở đây tạm lấy từ Header hoặc Guid mẫu.
         var hostId = Guid.NewGuid();
         var validPin = Pin.Create(pin);
-        var result = await _sessionService.StartSessionAsync(validPin.Value, hostId);
+        var result = await _sessionService.StartSessionAsync(validPin.Value, hostId, ct);
         return Ok(result);
     }
 
     // POST: /sessions/{pin}/cancel  - Hủy session [Auth: Host]
     [HttpPost("{pin}/cancel")]
-    public async Task<IActionResult> CancelAsync([FromRoute] string pin)
+    public async Task<IActionResult> CancelAsync([FromRoute] string pin, CancellationToken ct)
     {
         // Giả sử HostId được lấy từ Token/Identity. Ở đây tạm lấy từ Header hoặc Guid mẫu.
         var hostId = Guid.NewGuid();
-        await _sessionService.CancelSessionAsync(pin, hostId);
+        await _sessionService.CancelSessionAsync(pin, hostId, ct);
         return Ok();
     }
 
     // GET: /sessions/{pin} - Lấy session status [Public]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(SessionStatusDto), StatusCodes.Status200OK)]
     [HttpGet("{pin}/{sessionId:guid}/status")]
-    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
+    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value) ?? throw new SessionNotFoundException(pin);
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
         if (session.Id != sessionId)
         {
             throw new SessionNotFoundByIdException(sessionId);
@@ -78,10 +82,11 @@ public class SessionsController : ControllerBase
     // GET: /sessions/{pin} - Lấy session info [Public]
     [AllowAnonymous]
     [HttpGet("{pin}/{sessionId:guid}/info")]
-    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
+    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value) ?? throw new SessionNotFoundException(pin);
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
         if (session.Id != sessionId)
         {
             throw new SessionNotFoundByIdException(sessionId);
@@ -92,9 +97,9 @@ public class SessionsController : ControllerBase
     // GET: /sessions/history/{sessionId} - Lấy từ DB khi cache/local mất
     [AllowAnonymous]
     [HttpGet("history/{sessionId:guid}")]
-    public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId)
+    public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId, CancellationToken ct)
     {
-        var session = await _sessionService.GetSessionHistoryAsync(sessionId) ?? throw new SessionNotFoundByIdException(sessionId);
+        var session = await _sessionService.GetSessionHistoryAsync(sessionId, ct) ?? throw new SessionNotFoundByIdException(sessionId);
         return Ok(session.ToInfoDto());
     }
 }
