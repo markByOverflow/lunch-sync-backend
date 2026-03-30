@@ -44,7 +44,8 @@ public class SessionRepository : ISessionRepository
         return await _context.Sessions
             .AsNoTracking()
             .Include(s => s.Participants)
-            .Where(s => s.Pin == pin && s.Status != SessionStatus.Done)
+            .Where(s => s.Pin == pin && s.Status != SessionStatus.Done
+                && s.Status != SessionStatus.Cancelled)
             .FirstOrDefaultAsync(ct);
     }
 
