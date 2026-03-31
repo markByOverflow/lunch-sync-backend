@@ -1,4 +1,4 @@
-using LunchSync.Core.Common.Auth;
+﻿using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Common.ValueObjects;
 using LunchSync.Core.Exceptions;
@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LunchSync.Api.Controllers;
 
+//[Authorize]
 [ApiController]
 [Route("api/sessions")]
 public class SessionsController : ControllerBase
@@ -30,12 +31,11 @@ public class SessionsController : ControllerBase
     // Endpoint nay chi danh cho host da dang nhap.
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(
-        [FromBody] CreateSessionReq request,
-        CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(CreateSessionRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateSessionReq request, CancellationToken ct)
     {
         // Controller map principal -> local user id, business rule de service xu ly.
-        var hostId = await GetCurrentHostIdAsync(cancellationToken);
+        var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
             return Unauthorized();
@@ -47,29 +47,30 @@ public class SessionsController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("{pin}/join")]
-    public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request)
+    [ProducesResponseType(typeof(JoinRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request, CancellationToken ct)
     {
         // Guest join bang PIN va nickname, chua can host JWT.
         var validPin = Pin.Create(pin);
-        var result = await _sessionService.JoinSessionAsync(validPin.Value, request);
+        Guid? UserId = null; // Giả sử UserId được lấy từ Token/Identity. Ở đây tạm lấy Guid mẫu.
+        var result = await _sessionService.JoinSessionAsync(UserId, validPin.Value, request, ct);
         return Ok(result);
     }
 
     // Chi host moi duoc bat dau voting.
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpPost("{pin}/start")]
-    public async Task<IActionResult> StartAsync(
-        [FromRoute] string pin,
-        CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(SessionStartRes), StatusCodes.Status200OK)]
+    public async Task<IActionResult> StartAsync([FromRoute] string pin, CancellationToken ct)
     {
-        var hostId = await GetCurrentHostIdAsync(cancellationToken);
+        var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
             return Unauthorized();
         }
 
         var validPin = Pin.Create(pin);
-        var result = await _sessionService.StartSessionAsync(validPin.Value, hostId.Value);
+        var result = await _sessionService.StartSessionAsync(validPin.Value, hostId.Value, ct);
         return Ok(result);
     }
 
@@ -78,26 +79,28 @@ public class SessionsController : ControllerBase
     [HttpPost("{pin}/cancel")]
     public async Task<IActionResult> CancelAsync(
         [FromRoute] string pin,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
-        var hostId = await GetCurrentHostIdAsync(cancellationToken);
+        var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
             return Unauthorized();
         }
 
-        await _sessionService.CancelSessionAsync(pin, hostId.Value);
+        await _sessionService.CancelSessionAsync(pin, hostId.Value, ct);
         return Ok();
     }
 
     [AllowAnonymous]
+    [ProducesResponseType(typeof(SessionStatusDto), StatusCodes.Status200OK)]
     [HttpGet("{pin}/{sessionId:guid}/status")]
-    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
+    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value);
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
 
-        if (session == null || session.Id != sessionId)
+        if (session.Id != sessionId)
+
         {
             throw new EntityNotFoundException("session", sessionId);
         }
@@ -107,11 +110,12 @@ public class SessionsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("{pin}/{sessionId:guid}/info")]
-    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId)
+    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value);
-        if (session == null || session.Id != sessionId)
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
+        if (session.Id != sessionId)
         {
             throw new EntityNotFoundException("session", sessionId);
         }
@@ -121,10 +125,10 @@ public class SessionsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("history/{sessionId:guid}")]
-    public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId)
+    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId, CancellationToken ct)
     {
-        var session = await _sessionService.GetSessionHistoryAsync(sessionId)
-            ?? throw new EntityNotFoundException("session", sessionId);
+        var session = await _sessionService.GetSessionHistoryAsync(sessionId, ct) ?? throw new SessionNotFoundByIdException(sessionId);
         return Ok(session.ToInfoDto());
     }
 

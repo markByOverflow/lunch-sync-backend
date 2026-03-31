@@ -44,9 +44,9 @@ public class DishConfiguration : IEntityTypeConfiguration<Dish>
 
         builder.ToTable(t => t.HasCheckConstraint("chk_profile_valid", "jsonb_typeof(profile) = 'object'"));
 
-        builder.HasIndex(d => d.Profile)
-               .HasMethod("gin")
-               .HasDatabaseName("idx_dishes_profile");
+        // builder.HasIndex(d => d.Profile)
+        //        .HasMethod("gin")
+        //        .HasDatabaseName("idx_dishes_profile");
 
         builder.Property(d => d.CreatedAt)
                .HasColumnName("created_at")

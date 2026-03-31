@@ -1,6 +1,8 @@
 ﻿
 using LunchSync.Core.Common.Enums;
+using LunchSync.Core.Common.ValueObjects;
 using LunchSync.Core.Exceptions;
+using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.Sessions.Entities;
 
 using Microsoft.Extensions.Configuration;
@@ -12,29 +14,44 @@ public class SessionService : ISessionService
     private readonly ISessionCache _cache;
     private readonly ISessionRepository _repository;
     private readonly IConfiguration _configuration;
-    private readonly IPinManager _pinManager;
+    private readonly ICollectionRepository _collectionRepository;
     private const int MaxParticipants = 8;
     private const int MinParticipants = 3;
     private const int DefaultExpiryMinutes = 30;
-    private const int VotingExpiryMinutes = 90;
 
-    public SessionService(ISessionCache cache, ISessionRepository repository, IConfiguration configuration, IPinManager pinManager)
+    public SessionService(ISessionCache cache, ISessionRepository repository, IConfiguration configuration, ICollectionRepository collectionRepository)
     {
         _cache = cache;
         _repository = repository;
         _configuration = configuration;
-        _pinManager = pinManager;
+        _collectionRepository = collectionRepository;
     }
     //command Post => return DTO
     public async Task<CreateSessionRes> CreateSessionAsync(CreateSessionReq request, Guid HostId)
     {
-        //var collection = await _collectionRepository.GetByIdAsync(request.CollectionId);
-        // if (collection == null) throw new BusinessRuleViolationException("Bộ sưu tập không tồn tại.");
-        var collectionName = "";
-
+        var collection = await _collectionRepository.GetCollectionByIdAsync(request.CollectionId) ?? throw new CollectionNotFoundException(request.CollectionId);
         var now = DateTime.UtcNow;
         var sessionId = Guid.NewGuid();
-        var pin = await _pinManager.GetUnusedPinAsync(sessionId);
+
+        var pin = "";
+        for (int i = 0; i < 5; i++)
+        {
+            var candidate = Pin.Generate().Value;
+
+            // Check cả cache lẫn DB — pin có thể đang dùng nhưng chưa cache
+            var existsInCache = await _cache.GetActiveSessionByPinAsync(candidate) != null;
+            var existsInDb = !existsInCache && await _repository.GetActiveSessionByPinAsync(candidate) != null;
+
+            if (!existsInCache && !existsInDb)
+            {
+                pin = candidate;
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(pin))
+            throw new BusinessRuleViolationException("Không thể tạo mã PIN. Vui lòng thử lại.");
+
         var session = new Session
         {
             Id = sessionId,
@@ -46,89 +63,97 @@ public class SessionService : ISessionService
             CollectionId = request.CollectionId,
             PriceTier = request.PriceTier
         };
-        await _cache.SaveActiveSessionAsync(session, DefaultExpiryMinutes);
-        var hostParticipant = new Participant
+
+        var host = new Participant
         {
             Id = Guid.NewGuid(),
-            Nickname = request.Nickname, //hostname
-            JoinedAt = now
+            SessionId = session.Id,
+            Nickname = request.Nickname,
+            JoinedAt = DateTime.UtcNow,
+            UserId = HostId
         };
-        await _cache.TryJoinAtomicAsync(pin, hostParticipant, MaxParticipants, DefaultExpiryMinutes);
+
+        session.Participants.Add(host);
+        session.Collection = collection;
+
+        await _repository.SaveSessionAsync(session);
+        await _cache.SetSessionAsync(session);
 
         var baseUrl = _configuration["AppSettings:ClientBaseUrl"];
-        return session.ToCreateSessionRes(collectionName ?? "", baseUrl ?? "");
+        return session.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
 
     }
-    public async Task<JoinRes> JoinSessionAsync(string pin, JoinReq request)
+    public async Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default)
     {
-        var player = new Participant
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? await _repository.GetActiveSessionByPinAsync(pin, ct)
+                      ?? throw new SessionNotFoundException(pin);
+
+        if (session.Status != SessionStatus.Waiting)
+            throw new SessionAlreadyStartedException();
+        if (session.Participants.Count >= MaxParticipants)
+            throw new SessionFullException();
+        if (session.Participants.Any(p => p.Nickname == request.Nickname))
+            throw new NicknameTakenException(request.Nickname);
+
+        var participant = new Participant
         {
             Id = Guid.NewGuid(),
+            UserId = userId,
+            SessionId = session.Id,
             Nickname = request.Nickname,
             JoinedAt = DateTime.UtcNow
         };
-        var result = await _cache.TryJoinAtomicAsync(pin, player, MaxParticipants, DefaultExpiryMinutes);
-        switch (result)
-        {
-            case 1:
-                throw new BusinessRuleViolationException("Tên hiển thị này đã có người sử dụng.");
-            case 2:
-                throw new BusinessRuleViolationException("Phòng đã đầy.");
-            case 3:
-                throw new BusinessRuleViolationException("Phòng không tồn tại.");
-            case 4:
-                throw new BusinessRuleViolationException("Phòng đã bắt đầu hoặc kết thúc.");
-            case 0:
-                break;
-            default:
-                throw new BusinessRuleViolationException("Có lỗi xảy ra khi tham gia phòng.");
-        }
 
-        var session = await _cache.GetActiveSessionByPinAsync(pin)
-                      ?? throw new BusinessRuleViolationException("Không thể lấy thông tin phòng.");
+        session.Participants.Add(participant);
+        await _repository.SaveParticipantAsync(participant);
+        await _cache.SetSessionAsync(session, ct);
 
-        session.Participants = await _cache.GetParticipantsAsync(pin);
-
-        return player.ToJoinRes(session);
+        return participant.ToJoinRes(session);
     }
-    public async Task<SessionStartRes> StartSessionAsync(string pin, Guid hostId)
+    public async Task<SessionStartRes> StartSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
-        var session = await _cache.GetActiveSessionByPinAsync(pin)
-                      ?? throw new BusinessRuleViolationException("Phòng không tồn tại.");
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? await _repository.GetActiveSessionByPinAsync(pin, ct)
+                      ?? throw new SessionNotFoundException(pin);
 
         if (session.Status != SessionStatus.Waiting)
-            throw new BusinessRuleViolationException("Phòng đã bắt đầu.");
+            throw new SessionAlreadyStartedException();
         if (session.HostId != hostId)
-            throw new BusinessRuleViolationException("Chỉ chủ phòng mới có quyền bắt đầu.");
+            throw new NotHostException();
+        if (session.Participants.Count < MinParticipants)
+            throw new InsufficientParticipantsException(MinParticipants, session.Participants.Count);
 
-        var participants = await _cache.GetParticipantsAsync(pin);
-        if (participants.Count < MinParticipants)
-            throw new BusinessRuleViolationException($"Cần ít nhất {MinParticipants} người để bắt đầu.");
-
-        // Cập nhật trạng thái sang Voting và gia hạn thời gian
-        await _cache.UpdateStatusAndExpireAsync(pin, SessionStatus.Voting, VotingExpiryMinutes);
+        // Cập nhật trạng thái sang Voting
+        session.Status = SessionStatus.Voting;
+        await _repository.UpdateSessionAsync(session, s => s.Status, session.Status);
+        await _cache.SetSessionAsync(session, ct);
 
         return session.ToStartRes();
     }
-    public async Task CancelSessionAsync(string pin, Guid hostId)
+    public async Task CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
-        var session = await _cache.GetActiveSessionByPinAsync(pin);
+        var session = await _cache.GetActiveSessionByPinAsync(pin) ?? throw new SessionNotFoundException(pin);
         if (session != null && session.HostId == hostId)
         {
             await _cache.RemoveSessionAsync(pin);
-            await _pinManager.ReleasePinAsync(pin);
         }
+        await _repository.UpdateSessionAsync(session, s => s.Status, SessionStatus.Cancelled);
+        await _cache.RemoveSessionAsync(pin, ct);
+
     }
 
     //GET status+info => Object Session
-    public async Task<Session?> GetSessionAsync(string pin) => await _cache.GetActiveSessionByPinAsync(pin);
-
-    //GET Session trong db
-    public async Task<Session?> GetSessionHistoryAsync(Guid sessionId)
+    public async Task<Session?> GetSessionAsync(string pin, CancellationToken ct = default)
     {
-        // Truy cập DB để lấy dữ liệu lịch sử
-        var history = await _repository.GetHistoryByIdAsync(sessionId) ?? throw new BusinessRuleViolationException("Không tìm thấy thông tin lịch sử của phiên này.");
-        return history;
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct)
+            ?? await _repository.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        if (session.Collection == null)
+        {
+            session.Collection = await _collectionRepository.GetCollectionByIdAsync(session.CollectionId) ?? throw new CollectionNotFoundException(session.CollectionId);
+        }
+        return session;
     }
+    public async Task<Session?> GetSessionHistoryAsync(Guid sessionId, CancellationToken ct = default)
+    => await _repository.GetSessionByIdAsync(sessionId, ct);
+
 
 }

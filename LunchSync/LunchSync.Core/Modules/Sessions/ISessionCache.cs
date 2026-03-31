@@ -8,10 +8,8 @@ namespace LunchSync.Core.Modules.Sessions;
 
 public interface ISessionCache
 {
-    Task SaveActiveSessionAsync(Session session, int expireMinutes);
-    Task<Session?> GetActiveSessionByPinAsync(string pin);
-    Task UpdateStatusAndExpireAsync(string pin, SessionStatus newStatus, int expireMinutes);
-    Task<List<Participant>> GetParticipantsAsync(string pin);
-    Task RemoveSessionAsync(string pin);
-    Task<int> TryJoinAtomicAsync(string pin, Participant participant, int maxParticipants, int expireMinutes);
+    Task<Session?> GetActiveSessionByPinAsync(string pin, CancellationToken ct = default);
+    // Set / invalidate
+    Task SetSessionAsync(Session session, CancellationToken ct = default);
+    Task RemoveSessionAsync(string pin, CancellationToken ct = default);
 }

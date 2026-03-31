@@ -6,6 +6,7 @@
         Voting = 1,     // Đang vote
         Results = 2,    // Hiển thị kết quả
         Picking = 3,    // Boom/Pick
-        Done = 4        // Hoàn thành
+        Done = 4,        // Hoàn thành
+        Cancelled = 5   // Đã hủy
     }
 }

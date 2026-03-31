@@ -1,4 +1,4 @@
-using LunchSync.Core.Common.Auth;
+﻿using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using LunchSync.Core.Modules.RestaurantsAndDishes;
@@ -48,11 +48,20 @@ public static class DependencyInjection
         services.AddScoped<IDishRepository, DishRepository>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<ICollectionRepository, CollectionRepository>();
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddHttpClient<ICognitoAuthProvider, CognitoAuthProvider>();
         services.AddScoped<ISessionCache, SessionCache>();
-        services.AddScoped<IPinManager, PinManager>();
         services.AddSingleton<IGuestTokenService, GuestTokenService>();
+
+
+        // ── Caching ──
+        //services.AddSingleton<IDishProfileCache, InMemoryDishProfileCache>();
+        services.AddDistributedMemoryCache();
+        services.AddScoped<ISessionCache, SessionCache>();
+        // ── Auth (Cognito) ──
+        //services.AddScoped<ICognitoAuthProvider, CognitoAuthProvider>();
+
 
         return services;
     }
