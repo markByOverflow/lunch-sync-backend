@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Admin\" />
     <Folder Include="Modules\Auth\Entities\" />
     <Folder Include="Modules\VotingAndScoring\Entities\" />
   </ItemGroup>
