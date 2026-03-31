@@ -19,8 +19,6 @@ public class SessionCache : ISessionCache
         _db = redis.GetDatabase();
     }
 
-    private static string Key(string pin) => $"session:{pin}";
-
     public async Task SaveActiveSessionAsync(Session session, int expireMinutes)
     {
         var key = RedisKeyBuilder.Data(session.Pin);
@@ -50,7 +48,7 @@ public class SessionCache : ISessionCache
         await _db.KeyExpireAsync(nameKey, ttl);
     }
 
-    public async Task<List<Participant>> GetParticipantsAsync(string pin)
+    public async Task<List<Participant>> GetParticipantsAsync(string pin, CancellationToken ct = default)
     {
         var setKey = RedisKeyBuilder.Participants(pin);
         var members = await _db.SetMembersAsync(setKey); //lay participant trong set
@@ -65,7 +63,7 @@ public class SessionCache : ISessionCache
             .ToList()!;
     }
 
-    public async Task<Session?> GetActiveSessionByPinAsync(string pin)
+    public async Task<Session?> GetActiveSessionByPinAsync(string pin, CancellationToken ct = default)
     {
         var key = RedisKeyBuilder.Data(pin);
         var data = await _db.HashGetAllAsync(key);
@@ -110,12 +108,9 @@ public class SessionCache : ISessionCache
         };
 
         string luaScript = @"
-            -- 0. Check if session exists
-            if redis.call('EXISTS', KEYS[3]) == 0 then return 3 end
-
             -- 1. Kiểm tra trạng thái phòng
             local status = redis.call('HGET', KEYS[3], 'Status')
-            if status ~= '0' then return 4 end
+            if status ~= '0' then return 3 end
 
             -- 2. check duplicated name
             if redis.call('SISMEMBER', KEYS[1], ARGV[1]) == 1 then return 1 end

@@ -17,7 +17,8 @@ public class SessionService : ISessionService
     private readonly ICollectionRepository _collectionRepository;
     private const int MaxParticipants = 8;
     private const int MinParticipants = 3;
-    private const int DefaultExpiryMinutes = 30;
+    private const int DefaultExpiryMinutes = 15;
+    private const int VotingExpiryMinutes = 10;
 
     public SessionService(ISessionCache cache, ISessionRepository repository, IConfiguration configuration, ICollectionRepository collectionRepository)
     {
@@ -38,11 +39,8 @@ public class SessionService : ISessionService
         {
             var candidate = Pin.Generate().Value;
 
-            // Check cả cache lẫn DB — pin có thể đang dùng nhưng chưa cache
-            var existsInCache = await _cache.GetActiveSessionByPinAsync(candidate) != null;
-            var existsInDb = !existsInCache && await _repository.GetActiveSessionByPinAsync(candidate) != null;
-
-            if (!existsInCache && !existsInDb)
+            var exists = await _cache.GetActiveSessionByPinAsync(candidate);
+            if (exists != null)
             {
                 pin = candidate;
                 break;
@@ -64,6 +62,9 @@ public class SessionService : ISessionService
             PriceTier = request.PriceTier
         };
 
+        await _repository.SaveSessionAsync(session);
+        await _cache.SaveActiveSessionAsync(session, DefaultExpiryMinutes);
+
         var host = new Participant
         {
             Id = Guid.NewGuid(),
@@ -72,12 +73,7 @@ public class SessionService : ISessionService
             JoinedAt = DateTime.UtcNow,
             UserId = HostId
         };
-
-        session.Participants.Add(host);
-        session.Collection = collection;
-
-        await _repository.SaveSessionAsync(session);
-        await _cache.SetSessionAsync(session);
+        await _cache.TryJoinAtomicAsync(pin, host, MaxParticipants, DefaultExpiryMinutes);
 
         var baseUrl = _configuration["AppSettings:ClientBaseUrl"];
         return session.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
@@ -85,16 +81,7 @@ public class SessionService : ISessionService
     }
     public async Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default)
     {
-        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? await _repository.GetActiveSessionByPinAsync(pin, ct)
-                      ?? throw new SessionNotFoundException(pin);
-
-        if (session.Status != SessionStatus.Waiting)
-            throw new SessionAlreadyStartedException();
-        if (session.Participants.Count >= MaxParticipants)
-            throw new SessionFullException();
-        if (session.Participants.Any(p => p.Nickname == request.Nickname))
-            throw new NicknameTakenException(request.Nickname);
-
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
         var participant = new Participant
         {
             Id = Guid.NewGuid(),
@@ -104,54 +91,64 @@ public class SessionService : ISessionService
             JoinedAt = DateTime.UtcNow
         };
 
-        session.Participants.Add(participant);
-        await _repository.SaveParticipantAsync(participant);
-        await _cache.SetSessionAsync(session, ct);
+        var result = await _cache.TryJoinAtomicAsync(pin, participant, MaxParticipants, DefaultExpiryMinutes);
+        switch (result)
+        {
+            case 1:
+                throw new NicknameTakenException(request.Nickname);
+            case 2:
+                throw new SessionFullException();
+            case 3:
+                throw new SessionAlreadyStartedException();
+            case 0:
+                break;
+            default:
+                throw new BusinessRuleViolationException("Có lỗi xảy ra khi tham gia phòng.");
+        }
 
-        return participant.ToJoinRes(session);
+        var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin, ct)
+                      ?? throw new SessionNotFoundException(pin);
+
+        await _repository.SaveParticipantAsync(participant);
+        sessionUpdate.Participants = await _cache.GetParticipantsAsync(pin, ct);
+
+        return participant.ToJoinRes(sessionUpdate);
     }
     public async Task<SessionStartRes> StartSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
-        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? await _repository.GetActiveSessionByPinAsync(pin, ct)
-                      ?? throw new SessionNotFoundException(pin);
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
 
         if (session.Status != SessionStatus.Waiting)
             throw new SessionAlreadyStartedException();
         if (session.HostId != hostId)
             throw new NotHostException();
-        if (session.Participants.Count < MinParticipants)
-            throw new InsufficientParticipantsException(MinParticipants, session.Participants.Count);
+        var participants = await _cache.GetParticipantsAsync(pin, ct);
+        if (participants.Count < MinParticipants)
+            throw new InsufficientParticipantsException(MinParticipants, participants.Count);
 
         // Cập nhật trạng thái sang Voting
+        await _cache.UpdateStatusAndExpireAsync(pin, SessionStatus.Voting, VotingExpiryMinutes);
         session.Status = SessionStatus.Voting;
         await _repository.UpdateSessionAsync(session, s => s.Status, session.Status);
-        await _cache.SetSessionAsync(session, ct);
-
         return session.ToStartRes();
     }
     public async Task CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
-        var session = await _cache.GetActiveSessionByPinAsync(pin) ?? throw new SessionNotFoundException(pin);
-        if (session != null && session.HostId == hostId)
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        if (session.HostId == hostId)
         {
-            await _cache.RemoveSessionAsync(pin);
+            throw new NotHostException();
         }
         await _repository.UpdateSessionAsync(session, s => s.Status, SessionStatus.Cancelled);
-        await _cache.RemoveSessionAsync(pin, ct);
+        await _cache.RemoveSessionAsync(pin);
 
     }
 
     //GET status+info => Object Session
     public async Task<Session?> GetSessionAsync(string pin, CancellationToken ct = default)
-    {
-        var session = await _cache.GetActiveSessionByPinAsync(pin, ct)
-            ?? await _repository.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
-        if (session.Collection == null)
-        {
-            session.Collection = await _collectionRepository.GetCollectionByIdAsync(session.CollectionId) ?? throw new CollectionNotFoundException(session.CollectionId);
-        }
-        return session;
-    }
+    => await _cache.GetActiveSessionByPinAsync(pin, ct);
+
+    //GET Session trong db
     public async Task<Session?> GetSessionHistoryAsync(Guid sessionId, CancellationToken ct = default)
     => await _repository.GetSessionByIdAsync(sessionId, ct);
 
