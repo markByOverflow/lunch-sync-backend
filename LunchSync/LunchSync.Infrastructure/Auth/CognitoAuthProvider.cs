@@ -5,24 +5,37 @@ using System.Text.Json;
 using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace LunchSync.Infrastructure.Auth;
 
 public sealed class CognitoAuthProvider : ICognitoAuthProvider
 {
+    private static readonly JsonSerializerOptions CognitoJsonOptions = new()
+    {
+        PropertyNamingPolicy = null
+    };
+
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<CognitoAuthProvider> _logger;
 
-    public CognitoAuthProvider(HttpClient httpClient, IConfiguration configuration)
+    public CognitoAuthProvider(
+        HttpClient httpClient,
+        IConfiguration configuration,
+        ILogger<CognitoAuthProvider> logger)
     {
         _httpClient = httpClient;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<CognitoRegisterResult> RegisterAsync(
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
+        LogCognitoConfigSnapshot("register", request.Email);
+
         var payload = new
         {
             ClientId = GetRequiredConfig("Cognito:ClientId"),
@@ -57,6 +70,8 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         LoginRequest request,
         CancellationToken cancellationToken = default)
     {
+        LogCognitoConfigSnapshot("login", request.Email);
+
         var payload = new
         {
             AuthFlow = _configuration["Cognito:AuthFlow"] ?? "USER_PASSWORD_AUTH",
@@ -108,12 +123,22 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         object payload,
         CancellationToken cancellationToken)
     {
-        var endpoint = $"https://cognito-idp.{GetRequiredConfig("AWS:Region")}.amazonaws.com/";
+        var region = GetRequiredConfig("AWS:Region");
+        var endpoint = $"https://cognito-idp.{region}.amazonaws.com/";
+
+        // Log tam de xac nhan runtime dang goi dung endpoint Cognito nao.
+        _logger.LogInformation(
+            "Sending Cognito request. Target={Target}, Region={Region}, Endpoint={Endpoint}",
+            target,
+            region,
+            endpoint);
+
         using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
         request.Headers.TryAddWithoutValidation("X-Amz-Target", target);
         request.Headers.TryAddWithoutValidation("Accept", "application/json");
         request.Content = new StringContent(
-            JsonSerializer.Serialize(payload, JsonSerializerOptions.Web),
+            // Cognito JSON API yeu cau dung ten field PascalCase nhu ClientId, Username...
+            JsonSerializer.Serialize(payload, CognitoJsonOptions),
             Encoding.UTF8,
             "application/x-amz-json-1.1");
 
@@ -214,5 +239,18 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         }
 
         return value;
+    }
+
+    private void LogCognitoConfigSnapshot(string operation, string? email)
+    {
+        // Log tam de check app dang doc config nao khi goi Cognito.
+        _logger.LogInformation(
+            "Cognito config snapshot. Operation={Operation}, Region={Region}, ClientId={ClientId}, AuthFlow={AuthFlow}, Email={Email}, HasClientSecret={HasClientSecret}",
+            operation,
+            _configuration["AWS:Region"],
+            _configuration["Cognito:ClientId"],
+            _configuration["Cognito:AuthFlow"],
+            email,
+            !string.IsNullOrWhiteSpace(_configuration["Cognito:ClientSecret"]));
     }
 }
