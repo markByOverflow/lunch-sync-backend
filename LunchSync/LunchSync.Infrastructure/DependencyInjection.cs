@@ -8,9 +8,11 @@ using LunchSync.Infrastructure.Auth;
 using LunchSync.Infrastructure.Persistence;
 using LunchSync.Infrastructure.Persistence.Caching;
 using LunchSync.Infrastructure.Persistence.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using StackExchange.Redis;
 
 namespace LunchSync.Infrastructure;
@@ -54,11 +56,8 @@ public static class DependencyInjection
         services.AddScoped<ISessionCache, SessionCache>();
         services.AddSingleton<IGuestTokenService, GuestTokenService>();
 
-
         // ── Caching ──
         //services.AddSingleton<IDishProfileCache, InMemoryDishProfileCache>();
-        services.AddDistributedMemoryCache();
-        services.AddScoped<ISessionCache, SessionCache>();
         // ── Auth (Cognito) ──
         //services.AddScoped<ICognitoAuthProvider, CognitoAuthProvider>();
 
