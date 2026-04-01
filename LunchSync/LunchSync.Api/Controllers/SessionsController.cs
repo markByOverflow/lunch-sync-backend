@@ -4,12 +4,13 @@ using LunchSync.Core.Common.ValueObjects;
 using LunchSync.Core.Exceptions;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using LunchSync.Core.Modules.Sessions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LunchSync.Api.Controllers;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/sessions")]
 public class SessionsController : ControllerBase
@@ -52,7 +53,7 @@ public class SessionsController : ControllerBase
     {
         // Guest join bang PIN va nickname, chua can host JWT.
         var validPin = Pin.Create(pin);
-        Guid? UserId = null; // Giả sử UserId được lấy từ Token/Identity. Ở đây tạm lấy Guid mẫu.
+        Guid? UserId = await GetCurrentHostIdAsync(ct) ?? null; // Giả sử UserId được lấy từ Token/Identity. Ở đây tạm lấy Guid mẫu.
         var result = await _sessionService.JoinSessionAsync(UserId, validPin.Value, request, ct);
         return Ok(result);
     }
@@ -94,32 +95,20 @@ public class SessionsController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(SessionStatusDto), StatusCodes.Status200OK)]
     [HttpGet("{pin}/{sessionId:guid}/status")]
-    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
+    public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
-
-        if (session.Id != sessionId)
-
-        {
-            throw new EntityNotFoundException("session", sessionId);
-        }
-
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
         return Ok(session.ToStatusDto());
     }
 
     [AllowAnonymous]
     [HttpGet("{pin}/{sessionId:guid}/info")]
     [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, [FromRoute] Guid sessionId, CancellationToken ct)
+    public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
-        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionNotFoundException(pin);
-        if (session.Id != sessionId)
-        {
-            throw new EntityNotFoundException("session", sessionId);
-        }
-
+        var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
         return Ok(session.ToInfoDto());
     }
 

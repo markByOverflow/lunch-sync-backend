@@ -11,9 +11,17 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
     {
         builder.ToTable("participants");
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+        builder.Property(e => e.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("gen_random_uuid()");
 
-        builder.Property(e => e.Nickname).IsRequired().HasMaxLength(20);
+        builder.Property(e => e.Nickname)
+        .HasColumnName("nickname")
+        .IsRequired().HasMaxLength(20);
+
+        builder.Property(e => e.SessionId)          // ← thêm
+            .HasColumnName("session_id")
+            .IsRequired();
 
         // Quan hệ 1-N: Một Session có nhiều Participants
         builder.HasOne(p => p.Session) //1 session
@@ -25,10 +33,19 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
         builder.HasIndex(e => new { e.SessionId, e.Nickname }).IsUnique();
         builder.HasIndex(e => e.SessionId).HasDatabaseName("idx_participants_session");
 
-        builder.Property(e => e.PrefVector).HasColumnType("jsonb");
+        builder.Property(e => e.PrefVector)
+        .HasColumnName("pref_vector")
+        .HasColumnType("jsonb");
 
-        builder.Property(e => e.JoinedAt).IsRequired().HasColumnType("timestamp with time zone").HasDefaultValueSql("NOW()");
-        builder.Property(e => e.VotedAt).HasColumnType("timestamp with time zone");
+        builder.Property(e => e.JoinedAt)
+        .HasColumnName("joined_at")
+        .IsRequired()
+        .HasColumnType("timestamp with time zone")
+        .HasDefaultValueSql("NOW()");
+
+        builder.Property(e => e.VotedAt)
+        .HasColumnName("voted_at")
+        .HasColumnType("timestamp with time zone");
 
     }
 }

@@ -40,7 +40,7 @@ public class SessionService : ISessionService
             var candidate = Pin.Generate().Value;
 
             var exists = await _cache.GetActiveSessionByPinAsync(candidate);
-            if (exists != null)
+            if (exists == null)
             {
                 pin = candidate;
                 break;
@@ -61,7 +61,6 @@ public class SessionService : ISessionService
             CollectionId = request.CollectionId,
             PriceTier = request.PriceTier
         };
-
         await _repository.SaveSessionAsync(session);
         await _cache.SaveActiveSessionAsync(session, DefaultExpiryMinutes);
 
@@ -73,10 +72,14 @@ public class SessionService : ISessionService
             JoinedAt = DateTime.UtcNow,
             UserId = HostId
         };
+
         await _cache.TryJoinAtomicAsync(pin, host, MaxParticipants, DefaultExpiryMinutes);
+        await _repository.SaveParticipantAsync(host);
+
+        var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin) ?? throw new SessionNotFoundException(pin);
 
         var baseUrl = _configuration["AppSettings:ClientBaseUrl"];
-        return session.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
+        return sessionUpdate.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
 
     }
     public async Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default)
@@ -130,7 +133,9 @@ public class SessionService : ISessionService
         await _cache.UpdateStatusAndExpireAsync(pin, SessionStatus.Voting, VotingExpiryMinutes);
         session.Status = SessionStatus.Voting;
         await _repository.UpdateSessionAsync(session, s => s.Status, session.Status);
-        return session.ToStartRes();
+
+        var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        return sessionUpdate.ToStartRes();
     }
     public async Task CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
@@ -146,11 +151,14 @@ public class SessionService : ISessionService
 
     //GET status+info => Object Session
     public async Task<Session?> GetSessionAsync(string pin, CancellationToken ct = default)
-    => await _cache.GetActiveSessionByPinAsync(pin, ct);
+    {
+        var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionExpiredException();
+        session.Participants = await _cache.GetParticipantsAsync(pin, ct);
+        session.Collection = await _collectionRepository.GetCollectionByIdAsync(session.CollectionId, ct) ?? throw new CollectionNotFoundException(session.CollectionId);
+        return session;
+    }
 
     //GET Session trong db
     public async Task<Session?> GetSessionHistoryAsync(Guid sessionId, CancellationToken ct = default)
     => await _repository.GetSessionByIdAsync(sessionId, ct);
-
-
 }
