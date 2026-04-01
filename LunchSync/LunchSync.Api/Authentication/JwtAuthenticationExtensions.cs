@@ -3,6 +3,7 @@ using System.Text;
 using LunchSync.Core.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LunchSync.Api.Authentication;
@@ -11,6 +12,7 @@ public static class JwtAuthenticationExtensions
 {
     // Combined scheme giup app tu chon host JWT hay guest JWT theo header.
     public const string CombinedScheme = "CombinedJwt";
+    public const string AlbOidcScheme = "AlbOidc";
     public const string CognitoScheme = "CognitoJwt";
     public const string GuestScheme = "GuestJwt";
 
@@ -21,11 +23,18 @@ public static class JwtAuthenticationExtensions
         var cognitoIssuer = configuration["Cognito:Issuer"];
         var cognitoClientId = configuration["Cognito:ClientId"];
         var expectedTokenUse = configuration["Cognito:TokenUse"] ?? "id";
+        var allowDirectCognitoBearer = configuration.GetValue<bool>("AuthTesting:EnableDirectCognitoBearer");
+        var albOidcEnabled = configuration.GetValue<bool>($"{AlbOidcOptions.SectionName}:Enabled");
 
         var guestIssuer = configuration["GuestTokens:Issuer"] ?? "LunchSync.Api";
         var guestAudience = configuration["GuestTokens:Audience"] ?? "LunchSync.Guests";
         var guestSigningKey = configuration["GuestTokens:SigningKey"]
             ?? "change-me-to-a-long-random-secret-with-at-least-32-chars";
+
+        services.Configure<AlbOidcOptions>(
+            configuration.GetSection(AlbOidcOptions.SectionName));
+        services.AddMemoryCache();
+        services.AddHttpClient<AlbPublicKeyProvider>();
 
         services.AddAuthentication(options =>
         {
@@ -42,9 +51,22 @@ public static class JwtAuthenticationExtensions
                     return GuestScheme;
                 }
 
+                if (albOidcEnabled && context.Request.Headers.ContainsKey(AuthHeaderNames.AlbOidcData))
+                {
+                    return AlbOidcScheme;
+                }
+
+                if (albOidcEnabled && !allowDirectCognitoBearer)
+                {
+                    return AlbOidcScheme;
+                }
+
                 return CognitoScheme;
             };
         })
+        .AddScheme<AuthenticationSchemeOptions, AlbOidcAuthenticationHandler>(
+            AlbOidcScheme,
+            _ => { })
         .AddJwtBearer(CognitoScheme, options =>
         {
             options.MapInboundClaims = false;
