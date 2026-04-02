@@ -14,16 +14,6 @@ public sealed class AuthService : IAuthService
         _cognitoAuthProvider = cognitoAuthProvider;
     }
 
-    public async Task<RegistrationStatusResponse> GetRegistrationStatusAsync(
-        string cognitoSub,
-        CancellationToken cancellationToken = default)
-    {
-        // Kiem tra xem user Cognito nay da co ban ghi local chua.
-        var isRegistered = await _userRepository.ExistsByCognitoSubAsync(cognitoSub, cancellationToken);
-
-        return new RegistrationStatusResponse(cognitoSub, isRegistered);
-    }
-
     public async Task<RegisterResponse> RegisterAsync(
         RegisterRequest request,
         CancellationToken cancellationToken = default)
@@ -104,7 +94,6 @@ public sealed class AuthService : IAuthService
             user = await _userRepository.UpdateAsync(user, cancellationToken);
         }
 
-        // App hien dang xac thuc bang token co day du claim profile cho backend.
-        return user.ToLoginResponse(cognitoResult.AppBearerToken, cognitoResult.ExpiresIn);
+        return user.ToLoginResponse(cognitoResult.AccessToken, cognitoResult.ExpiresIn);
     }
 }

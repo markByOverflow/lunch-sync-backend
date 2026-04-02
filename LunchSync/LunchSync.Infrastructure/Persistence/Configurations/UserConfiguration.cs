@@ -39,8 +39,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Role)
                .HasColumnName("role")
                .HasConversion<string>()
-               // Default role sau rebase chi con User/Admin.
-               .HasDefaultValue(UserRole.User);
+               .HasDefaultValue(UserRole.Host);
         builder.HasIndex(u => u.Role).HasDatabaseName("idx_users_role");
 
         builder.Property(u => u.IsActive)

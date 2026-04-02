@@ -22,20 +22,20 @@ public sealed class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpGet("me")]
     public IActionResult Me()
     {
         if (!_currentUser.IsAuthenticated)
             return Unauthorized();
 
-        // Tra ve principal da duoc chuan hoa sau khi auth xong.
-        return Ok(new CurrentActorResponse(
-            _currentUser.UserId,
+        return Ok(new CurrentUserResponse(
+            _currentUser.LocalUserId,
+            _currentUser.CognitoSub,
             _currentUser.Email,
             _currentUser.Name,
-            _currentUser.ActorType,
-            _currentUser.Roles));
+            _currentUser.Role,
+            _currentUser.IsActive));
     }
 
     [AllowAnonymous]
@@ -78,14 +78,4 @@ public sealed class AuthController : ControllerBase
         }
     }
 
-    [Authorize(Policy = AuthPolicies.CognitoUser)]
-    [HttpGet("registration-status")]
-    public async Task<IActionResult> RegistrationStatus(CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(_currentUser.UserId))
-            return Unauthorized();
-
-        var response = await _authService.GetRegistrationStatusAsync(_currentUser.UserId, cancellationToken);
-        return Ok(response);
-    }
 }

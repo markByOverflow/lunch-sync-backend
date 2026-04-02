@@ -28,17 +28,13 @@ public sealed record LoginResponse(
     string Role
 );
 
-public sealed record CurrentActorResponse(
-    string? UserId,
+public sealed record CurrentUserResponse(
+    Guid? UserId,
+    string? CognitoSub,
     string? Email,
-    string? Name,
-    string? ActorType,
-    IReadOnlyList<string> Roles
-);
-
-public sealed record RegistrationStatusResponse(
-    string CognitoSub,
-    bool IsRegistered
+    string? FullName,
+    string? Role,
+    bool IsActive
 );
 
 public sealed record CognitoRegisterResult(
@@ -48,7 +44,7 @@ public sealed record CognitoRegisterResult(
 );
 
 public sealed record CognitoLoginResult(
-    string AppBearerToken,
+    string AccessToken,
     int ExpiresIn,
     string CognitoSub,
     string Email,

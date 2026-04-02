@@ -19,26 +19,49 @@ public sealed class CurrentUserService : ICurrentUserService
     public bool IsAuthenticated =>
         User?.Identity?.IsAuthenticated ?? false;
 
-    // Host/user dung sub lam dinh danh chinh.
+    // Host flow hien tai van dung Cognito sub lam identity xuyen suot.
     public string? UserId =>
+        CognitoSub
+        ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    public string? CognitoSub =>
         User?.FindFirst("sub")?.Value
         ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    public Guid? LocalUserId
+    {
+        get
+        {
+            var value = User?.FindFirst(AuthClaimTypes.LocalUserId)?.Value;
+            return Guid.TryParse(value, out var userId) ? userId : null;
+        }
+    }
 
     public string? ActorType =>
         User?.FindFirst(AuthClaimTypes.ActorType)?.Value;
 
     public string? Email =>
-        User?.FindFirst("email")?.Value
+        User?.FindFirst(AuthClaimTypes.Email)?.Value
+        ?? User?.FindFirst("email")?.Value
         ?? User?.FindFirst(ClaimTypes.Email)?.Value;
 
     public string? Name =>
-        User?.FindFirst("name")?.Value
+        User?.FindFirst(AuthClaimTypes.FullName)?.Value
+        ?? User?.FindFirst("name")?.Value
         ?? User?.FindFirst(ClaimTypes.Name)?.Value;
 
-    // Cognito groups tam thoi la nguon role cho principal.
-    public IReadOnlyList<string> Roles =>
-        User?.FindAll("cognito:groups")
-             .Select(x => x.Value)
-             .ToList()
-        ?? new List<string>();
+    public string? Role =>
+        User?.FindFirst(AuthClaimTypes.Role)?.Value
+        ?? User?.FindFirst("cognito:groups")?.Value;
+
+    public bool IsActive
+    {
+        get
+        {
+            var value = User?.FindFirst(AuthClaimTypes.IsActive)?.Value;
+            return bool.TryParse(value, out var isActive)
+                ? isActive
+                : IsAuthenticated;
+        }
+    }
 }

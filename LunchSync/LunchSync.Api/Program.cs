@@ -52,7 +52,7 @@ public class Program
                 Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Host/User token gui bang Authorization: Bearer <token>."
+                Description = "Host token gui bang Authorization: Bearer <token>."
             });
         });
 
