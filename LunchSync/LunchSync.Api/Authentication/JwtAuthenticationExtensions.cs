@@ -1,17 +1,12 @@
 using System.Security.Claims;
 using LunchSync.Core.Common.Auth;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LunchSync.Api.Authentication;
 
 public static class JwtAuthenticationExtensions
 {
-    // Combined scheme giup app tu chon host JWT theo header/cau hinh runtime.
-    public const string CombinedScheme = "CombinedJwt";
-    public const string AlbOidcScheme = "AlbOidc";
     public const string CognitoScheme = "CognitoJwt";
 
     public static IServiceCollection AddLunchSyncAuthentication(
@@ -21,39 +16,12 @@ public static class JwtAuthenticationExtensions
         var cognitoIssuer = configuration["Cognito:Issuer"];
         var cognitoClientId = configuration["Cognito:ClientId"];
         var expectedTokenUse = configuration["Cognito:TokenUse"] ?? "id";
-        var allowDirectCognitoBearer = configuration.GetValue<bool>("AuthTesting:EnableDirectCognitoBearer");
-        var albOidcEnabled = configuration.GetValue<bool>($"{AlbOidcOptions.SectionName}:Enabled");
-
-        services.Configure<AlbOidcOptions>(
-            configuration.GetSection(AlbOidcOptions.SectionName));
-        services.AddMemoryCache();
-        services.AddHttpClient<AlbPublicKeyProvider>();
 
         services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = CombinedScheme;
-            options.DefaultChallengeScheme = CombinedScheme;
+            options.DefaultAuthenticateScheme = CognitoScheme;
+            options.DefaultChallengeScheme = CognitoScheme;
         })
-        .AddPolicyScheme(CombinedScheme, CombinedScheme, options =>
-        {
-            options.ForwardDefaultSelector = context =>
-            {
-                if (albOidcEnabled && context.Request.Headers.ContainsKey(AuthHeaderNames.AlbOidcData))
-                {
-                    return AlbOidcScheme;
-                }
-
-                if (albOidcEnabled && !allowDirectCognitoBearer)
-                {
-                    return AlbOidcScheme;
-                }
-
-                return CognitoScheme;
-            };
-        })
-        .AddScheme<AuthenticationSchemeOptions, AlbOidcAuthenticationHandler>(
-            AlbOidcScheme,
-            _ => { })
         .AddJwtBearer(CognitoScheme, options =>
         {
             options.MapInboundClaims = false;
@@ -74,7 +42,7 @@ public static class JwtAuthenticationExtensions
             {
                 OnTokenValidated = context =>
                 {
-                    // Them actor type de policy dung chung cho host va guest.
+                    // Them actor type de policy auth trong app dung chung.
                     var identity = context.Principal?.Identity as ClaimsIdentity;
                     if (identity is null)
                     {
