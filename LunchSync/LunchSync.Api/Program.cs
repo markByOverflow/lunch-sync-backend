@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using LunchSync.Api.Authentication;
 using LunchSync.Api.Middleware;
 using LunchSync.Api.Services;
+using LunchSync.Api.Swagger;
 using LunchSync.Core;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
@@ -67,6 +68,8 @@ public class Program
                 In = ParameterLocation.Header,
                 Description = "User token gui bang Authorization: Bearer <token>."
             });
+
+            options.OperationFilter<AuthorizeOperationFilter>();
         });
 
         var app = builder.Build();
