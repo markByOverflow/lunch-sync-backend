@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using LunchSync.Core.Common.Auth;
+using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LunchSync.Api.Authentication;
@@ -35,19 +37,18 @@ public static class JwtAuthenticationExtensions
                 ValidateAudience = false,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(2),
-                NameClaimType = "name",
-                RoleClaimType = "cognito:groups"
+                NameClaimType = AuthClaimTypes.FullName,
+                RoleClaimType = AuthClaimTypes.Role
             };
             options.Events = new JwtBearerEvents
             {
-                OnTokenValidated = context =>
+                OnTokenValidated = async context =>
                 {
-                    // Them actor type de policy auth trong app dung chung.
                     var identity = context.Principal?.Identity as ClaimsIdentity;
                     if (identity is null)
                     {
                         context.Fail("Missing identity.");
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     var tokenUse = context.Principal?.FindFirst("token_use")?.Value;
@@ -58,7 +59,7 @@ public static class JwtAuthenticationExtensions
                     if (tokenUse != expectedTokenUse || string.IsNullOrWhiteSpace(subject))
                     {
                         context.Fail("Invalid Cognito token.");
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     if (!string.IsNullOrWhiteSpace(cognitoClientId)
@@ -66,7 +67,15 @@ public static class JwtAuthenticationExtensions
                         && clientId != cognitoClientId)
                     {
                         context.Fail("Invalid Cognito audience.");
-                        return Task.CompletedTask;
+                        return;
+                    }
+
+                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                    var localUser = await userRepository.GetByCognitoSubAsync(subject, context.HttpContext.RequestAborted);
+                    if (localUser is null || !localUser.IsActive)
+                    {
+                        context.Fail("Local user is missing or inactive.");
+                        return;
                     }
 
                     if (!identity.HasClaim(claim => claim.Type == AuthClaimTypes.ActorType))
@@ -74,11 +83,30 @@ public static class JwtAuthenticationExtensions
                         identity.AddClaim(new Claim(AuthClaimTypes.ActorType, AuthActorTypes.User));
                     }
 
-                    return Task.CompletedTask;
+                    AddOrReplaceClaim(identity, AuthClaimTypes.LocalUserId, localUser.Id.ToString());
+                    AddOrReplaceClaim(identity, AuthClaimTypes.Role, localUser.Role.ToString().ToLowerInvariant());
+                    AddOrReplaceClaim(identity, AuthClaimTypes.IsActive, bool.TrueString);
+                    AddOrReplaceClaim(identity, AuthClaimTypes.Email, localUser.Email);
+                    AddOrReplaceClaim(identity, AuthClaimTypes.FullName, localUser.FullName);
                 }
             };
         });
 
         return services;
+    }
+
+    private static void AddOrReplaceClaim(ClaimsIdentity identity, string claimType, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        foreach (var claim in identity.FindAll(claimType).ToList())
+        {
+            identity.RemoveClaim(claim);
+        }
+
+        identity.AddClaim(new Claim(claimType, value));
     }
 }

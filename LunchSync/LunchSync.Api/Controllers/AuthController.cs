@@ -4,6 +4,7 @@ using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LunchSync.Api.Controllers;
 
@@ -39,6 +40,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth-public")]
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         [FromBody] RegisterRequest? request,
@@ -51,6 +53,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth-public")]
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest? request,

@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using LunchSync.Api.Authentication;
 using LunchSync.Api.Middleware;
 using LunchSync.Api.Services;
@@ -5,6 +6,7 @@ using LunchSync.Core;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Infrastructure;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 
 namespace LunchSync.Api;
@@ -23,6 +25,17 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         // Cau hinh auth theo JWT cho host/user va guest.
         builder.Services.AddLunchSyncAuthentication(builder.Configuration);
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddFixedWindowLimiter("auth-public", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = 5;
+                limiterOptions.Window = TimeSpan.FromMinutes(1);
+                limiterOptions.QueueLimit = 0;
+                limiterOptions.AutoReplenishment = true;
+            });
+        });
 
         builder.Services.AddAuthorization(options =>
         {
@@ -72,6 +85,8 @@ public class Program
 
         // Gom loi domain/unhandled ve mot format response thong nhat.
         app.UseGlobalExceptionHandler();
+
+        app.UseRateLimiter();
 
         // Xac thuc truoc, phan quyen sau.
         app.UseAuthentication();
