@@ -30,11 +30,6 @@ public class Program
             {
                 policy.RequireClaim(AuthClaimTypes.ActorType, AuthActorTypes.User);
             });
-
-            options.AddPolicy(AuthPolicies.Guest, policy =>
-            {
-                policy.RequireClaim(AuthClaimTypes.ActorType, AuthActorTypes.Guest);
-            });
         });
 
         builder.Services.AddHttpContextAccessor();
@@ -58,14 +53,6 @@ public class Program
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
                 Description = "Host/User token gui bang Authorization: Bearer <token>."
-            });
-
-            options.AddSecurityDefinition("GuestToken", new OpenApiSecurityScheme
-            {
-                Name = AuthHeaderNames.GuestToken,
-                Type = SecuritySchemeType.ApiKey,
-                In = ParameterLocation.Header,
-                Description = "Guest JWT issued by POST /api/auth/guest-token."
             });
         });
 

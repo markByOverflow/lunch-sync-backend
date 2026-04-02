@@ -13,16 +13,13 @@ public sealed class AuthController : ControllerBase
 {
     private readonly ICurrentUserService _currentUser;
     private readonly IAuthService _authService;
-    private readonly IGuestTokenService _guestTokenService;
 
     public AuthController(
         ICurrentUserService currentUser,
-        IAuthService authService,
-        IGuestTokenService guestTokenService)
+        IAuthService authService)
     {
         _currentUser = currentUser;
         _authService = authService;
-        _guestTokenService = guestTokenService;
     }
 
     [Authorize]
@@ -90,26 +87,5 @@ public sealed class AuthController : ControllerBase
 
         var response = await _authService.GetRegistrationStatusAsync(_currentUser.UserId, cancellationToken);
         return Ok(response);
-    }
-
-    [AllowAnonymous]
-    [HttpPost("guest-token")]
-    public IActionResult IssueGuestToken([FromBody] GuestAccessTokenRequest? request)
-    {
-        if (request is null)
-        {
-            return ValidationProblem(detail: "Guest token request body is required.");
-        }
-
-        try
-        {
-            // Guest token duoc cap rieng de client guest goi cac endpoint public/guest.
-            var response = _guestTokenService.IssueToken(request);
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return ValidationProblem(detail: ex.Message);
-        }
     }
 }

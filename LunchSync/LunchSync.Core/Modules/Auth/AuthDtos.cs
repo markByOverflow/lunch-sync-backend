@@ -54,13 +54,3 @@ public sealed record CognitoLoginResult(
     string Email,
     string? FullName
 );
-
-public sealed record GuestAccessTokenRequest(
-    string Nickname
-);
-
-public sealed record GuestAccessTokenResponse(
-    string Token,
-    DateTime ExpiresAtUtc,
-    string HeaderName
-);

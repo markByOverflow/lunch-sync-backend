@@ -8,5 +8,4 @@ public interface ICurrentUserService
     string? Name { get; }
     IReadOnlyList<string> Roles { get; }
     bool IsAuthenticated { get; }
-    bool IsGuest { get; }
 }

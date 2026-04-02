@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text;
 using LunchSync.Core.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,11 +9,10 @@ namespace LunchSync.Api.Authentication;
 
 public static class JwtAuthenticationExtensions
 {
-    // Combined scheme giup app tu chon host JWT hay guest JWT theo header.
+    // Combined scheme giup app tu chon host JWT theo header/cau hinh runtime.
     public const string CombinedScheme = "CombinedJwt";
     public const string AlbOidcScheme = "AlbOidc";
     public const string CognitoScheme = "CognitoJwt";
-    public const string GuestScheme = "GuestJwt";
 
     public static IServiceCollection AddLunchSyncAuthentication(
         this IServiceCollection services,
@@ -25,11 +23,6 @@ public static class JwtAuthenticationExtensions
         var expectedTokenUse = configuration["Cognito:TokenUse"] ?? "id";
         var allowDirectCognitoBearer = configuration.GetValue<bool>("AuthTesting:EnableDirectCognitoBearer");
         var albOidcEnabled = configuration.GetValue<bool>($"{AlbOidcOptions.SectionName}:Enabled");
-
-        var guestIssuer = configuration["GuestTokens:Issuer"] ?? "LunchSync.Api";
-        var guestAudience = configuration["GuestTokens:Audience"] ?? "LunchSync.Guests";
-        var guestSigningKey = configuration["GuestTokens:SigningKey"]
-            ?? "change-me-to-a-long-random-secret-with-at-least-32-chars";
 
         services.Configure<AlbOidcOptions>(
             configuration.GetSection(AlbOidcOptions.SectionName));
@@ -45,12 +38,6 @@ public static class JwtAuthenticationExtensions
         {
             options.ForwardDefaultSelector = context =>
             {
-                // Guest gui token qua header rieng, con lai mac dinh la bearer token.
-                if (context.Request.Headers.ContainsKey(AuthHeaderNames.GuestToken))
-                {
-                    return GuestScheme;
-                }
-
                 if (albOidcEnabled && context.Request.Headers.ContainsKey(AuthHeaderNames.AlbOidcData))
                 {
                     return AlbOidcScheme;
@@ -117,56 +104,6 @@ public static class JwtAuthenticationExtensions
                     if (!identity.HasClaim(claim => claim.Type == AuthClaimTypes.ActorType))
                     {
                         identity.AddClaim(new Claim(AuthClaimTypes.ActorType, AuthActorTypes.User));
-                    }
-
-                    return Task.CompletedTask;
-                }
-            };
-        })
-        .AddJwtBearer(GuestScheme, options =>
-        {
-            options.MapInboundClaims = false;
-            // Guest token la JWT noi bo ky bang symmetric key.
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = guestIssuer,
-                ValidateAudience = true,
-                ValidAudience = guestAudience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(1),
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(guestSigningKey)),
-                NameClaimType = AuthClaimTypes.Nickname
-            };
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    // Guest token di bang header rieng de khong trung voi bearer token.
-                    context.Token = context.Request.Headers[AuthHeaderNames.GuestToken].FirstOrDefault();
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    // Guest principal cung duoc chuan hoa ve claim actor_type.
-                    var identity = context.Principal?.Identity as ClaimsIdentity;
-                    if (identity is null)
-                    {
-                        context.Fail("Missing identity.");
-                        return Task.CompletedTask;
-                    }
-
-                    var subject = context.Principal?.FindFirst("sub")?.Value;
-                    if (string.IsNullOrWhiteSpace(subject))
-                    {
-                        context.Fail("Invalid guest token.");
-                        return Task.CompletedTask;
-                    }
-
-                    if (!identity.HasClaim(claim => claim.Type == AuthClaimTypes.ActorType))
-                    {
-                        identity.AddClaim(new Claim(AuthClaimTypes.ActorType, AuthActorTypes.Guest));
                     }
 
                     return Task.CompletedTask;

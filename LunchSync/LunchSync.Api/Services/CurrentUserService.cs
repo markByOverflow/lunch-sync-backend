@@ -19,7 +19,7 @@ public sealed class CurrentUserService : ICurrentUserService
     public bool IsAuthenticated =>
         User?.Identity?.IsAuthenticated ?? false;
 
-    // Host/user va guest deu dung sub lam dinh danh chinh.
+    // Host/user dung sub lam dinh danh chinh.
     public string? UserId =>
         User?.FindFirst("sub")?.Value
         ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -33,8 +33,7 @@ public sealed class CurrentUserService : ICurrentUserService
 
     public string? Name =>
         User?.FindFirst("name")?.Value
-        ?? User?.FindFirst(ClaimTypes.Name)?.Value
-        ?? User?.FindFirst(AuthClaimTypes.Nickname)?.Value;
+        ?? User?.FindFirst(ClaimTypes.Name)?.Value;
 
     // Cognito groups tam thoi la nguon role cho principal.
     public IReadOnlyList<string> Roles =>
@@ -42,7 +41,4 @@ public sealed class CurrentUserService : ICurrentUserService
              .Select(x => x.Value)
              .ToList()
         ?? new List<string>();
-
-    public bool IsGuest =>
-        string.Equals(ActorType, AuthActorTypes.Guest, StringComparison.Ordinal);
 }
