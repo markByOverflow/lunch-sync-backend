@@ -2,7 +2,7 @@ using System.Security.Claims;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 
-namespace LunchSync.Api.Services;
+namespace LunchSync.Api.Authentication;
 
 public sealed class CurrentUserService : ICurrentUserService
 {
