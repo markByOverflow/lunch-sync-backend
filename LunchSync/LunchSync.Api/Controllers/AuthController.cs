@@ -44,18 +44,10 @@ public sealed class AuthController : ControllerBase
         [FromBody] RegisterRequest? request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            // Public register se tao user tren Cognito va tao local user cho app.
-            var response = await _authService.RegisterAsync(
-                request ?? new RegisterRequest(string.Empty, string.Empty, null),
-                cancellationToken);
-            return StatusCode(StatusCodes.Status201Created, response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return ValidationProblem(detail: ex.Message);
-        }
+        var response = await _authService.RegisterAsync(
+            request ?? new RegisterRequest(string.Empty, string.Empty, null),
+            cancellationToken);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
     [AllowAnonymous]
@@ -64,18 +56,10 @@ public sealed class AuthController : ControllerBase
         [FromBody] LoginRequest? request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            // Login se lay token tu Cognito va dong bo local user neu can.
-            var response = await _authService.LoginAsync(
-                request ?? new LoginRequest(string.Empty, string.Empty),
-                cancellationToken);
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return ValidationProblem(detail: ex.Message);
-        }
+        var response = await _authService.LoginAsync(
+            request ?? new LoginRequest(string.Empty, string.Empty),
+            cancellationToken);
+        return Ok(response);
     }
 
 }

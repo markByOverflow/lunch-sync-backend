@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using LunchSync.Core.Exceptions;
 using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +35,7 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
-        LogCognitoConfigSnapshot("register", request.Email);
+        LogCognitoConfigSnapshot("register");
 
         var payload = new
         {
@@ -51,7 +52,7 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
             cancellationToken);
 
         using var document = await ReadResponseDocumentAsync(response, cancellationToken);
-        EnsureSuccess(response, document);
+        EnsureSuccess(response, document, request.Email);
 
         var root = document.RootElement;
         var userSub = root.GetProperty("UserSub").GetString();
@@ -70,7 +71,7 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         LoginRequest request,
         CancellationToken cancellationToken = default)
     {
-        LogCognitoConfigSnapshot("login", request.Email);
+        LogCognitoConfigSnapshot("login");
 
         var payload = new
         {
@@ -85,33 +86,45 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
             cancellationToken);
 
         using var document = await ReadResponseDocumentAsync(response, cancellationToken);
-        EnsureSuccess(response, document);
+        EnsureSuccess(response, document, request.Email);
 
         if (!document.RootElement.TryGetProperty("AuthenticationResult", out var authResult))
         {
             throw new InvalidOperationException("Cognito login did not return authentication result.");
         }
 
-        var idToken = authResult.GetProperty("IdToken").GetString();
+        var accessToken = authResult.GetProperty("AccessToken").GetString();
+        var idToken = authResult.TryGetProperty("IdToken", out var idTokenElement)
+            ? idTokenElement.GetString()
+            : null;
         var expiresIn = authResult.GetProperty("ExpiresIn").GetInt32();
-        if (string.IsNullOrWhiteSpace(idToken))
+        if (string.IsNullOrWhiteSpace(accessToken))
         {
-            throw new InvalidOperationException("Cognito login did not return id token.");
+            throw new InvalidOperationException("Cognito login did not return access token.");
         }
 
-        // App tam thoi dung id token lam bearer token vi backend can profile claim.
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(idToken);
-        var cognitoSub = jwt.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
-        var email = jwt.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
-        var fullName = jwt.Claims.FirstOrDefault(claim => claim.Type == "name")?.Value;
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var accessJwt = tokenHandler.ReadJwtToken(accessToken);
+        var cognitoSub = accessJwt.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+
+        string? email = null;
+        string? fullName = null;
+        if (!string.IsNullOrWhiteSpace(idToken))
+        {
+            var idJwt = tokenHandler.ReadJwtToken(idToken);
+            email = idJwt.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            fullName = idJwt.Claims.FirstOrDefault(claim => claim.Type == "name")?.Value;
+        }
+
+        email ??= request.Email.Trim().ToLowerInvariant();
 
         if (string.IsNullOrWhiteSpace(cognitoSub) || string.IsNullOrWhiteSpace(email))
         {
-            throw new InvalidOperationException("Cognito id token is missing required claims.");
+            throw new InvalidOperationException("Cognito access token is missing required claims.");
         }
 
         return new CognitoLoginResult(
-            idToken,
+            accessToken,
             expiresIn,
             cognitoSub,
             email.Trim().ToLowerInvariant(),
@@ -158,7 +171,7 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         return JsonDocument.Parse(content);
     }
 
-    private static void EnsureSuccess(HttpResponseMessage response, JsonDocument document)
+    private static void EnsureSuccess(HttpResponseMessage response, JsonDocument document, string? email = null)
     {
         if (response.IsSuccessStatusCode)
         {
@@ -166,13 +179,44 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         }
 
         var root = document.RootElement;
+        var errorType = root.TryGetProperty("__type", out var type)
+            ? type.GetString()
+            : root.TryGetProperty("code", out var code)
+                ? code.GetString()
+                : null;
+
+        if (!string.IsNullOrWhiteSpace(errorType) && errorType.Contains('#'))
+        {
+            errorType = errorType.Split('#').Last();
+        }
+
         var message = root.TryGetProperty("message", out var lowerMessage)
             ? lowerMessage.GetString()
             : root.TryGetProperty("Message", out var upperMessage)
                 ? upperMessage.GetString()
                 : "Cognito request failed.";
 
-        throw new InvalidOperationException(message ?? "Cognito request failed.");
+        throw MapCognitoException(errorType, message, email);
+    }
+
+    private static Exception MapCognitoException(string? errorType, string? message, string? email)
+    {
+        return errorType switch
+        {
+            "UsernameExistsException" => new DuplicateEntityException("User", "email", email ?? "unknown"),
+            "NotAuthorizedException" => new InvalidCredentialsException(),
+            "UserNotFoundException" => new InvalidCredentialsException(),
+            "UserNotConfirmedException" => new ValidationException(
+                "Tài khoản chưa được xác nhận.",
+                new Dictionary<string, string> { ["email"] = "Vui lòng xác nhận email trước khi đăng nhập." }),
+            "InvalidPasswordException" => new ValidationException(
+                "Mật khẩu không hợp lệ.",
+                new Dictionary<string, string> { ["password"] = message ?? "Mật khẩu không đáp ứng policy của Cognito." }),
+            "InvalidParameterException" => new ValidationException(
+                "Dữ liệu gửi lên không hợp lệ.",
+                new Dictionary<string, string> { ["auth"] = message ?? "Yêu cầu không hợp lệ." }),
+            _ => new InvalidOperationException(message ?? "Cognito request failed.")
+        };
     }
 
     private Dictionary<string, string> BuildAuthParameters(LoginRequest request)
@@ -241,16 +285,14 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         return value;
     }
 
-    private void LogCognitoConfigSnapshot(string operation, string? email)
+    private void LogCognitoConfigSnapshot(string operation)
     {
-        // Log tam de check app dang doc config nao khi goi Cognito.
         _logger.LogInformation(
-            "Cognito config snapshot. Operation={Operation}, Region={Region}, ClientId={ClientId}, AuthFlow={AuthFlow}, Email={Email}, HasClientSecret={HasClientSecret}",
+            "Cognito config snapshot. Operation={Operation}, Region={Region}, ClientId={ClientId}, AuthFlow={AuthFlow}, HasClientSecret={HasClientSecret}",
             operation,
             _configuration["AWS:Region"],
             _configuration["Cognito:ClientId"],
             _configuration["Cognito:AuthFlow"],
-            email,
             !string.IsNullOrWhiteSpace(_configuration["Cognito:ClientSecret"]));
     }
 }
