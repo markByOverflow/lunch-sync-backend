@@ -23,7 +23,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        // Cau hinh auth theo JWT cho host/user va guest.
+        // Cau hinh auth theo JWT cho user va guest.
         builder.Services.AddLunchSyncAuthentication(builder.Configuration);
         builder.Services.AddRateLimiter(options =>
         {
@@ -65,7 +65,7 @@ public class Program
                 Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Host token gui bang Authorization: Bearer <token>."
+                Description = "User token gui bang Authorization: Bearer <token>."
             });
         });
 

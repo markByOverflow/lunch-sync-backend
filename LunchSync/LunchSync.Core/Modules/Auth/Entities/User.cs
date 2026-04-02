@@ -8,7 +8,7 @@ public class User : BaseEntity
     public string CognitoSub { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? FullName { get; set; }
-    public UserRole Role { get; set; } = UserRole.Host;
+    public UserRole Role { get; set; } = UserRole.User;
     public bool IsActive { get; set; } = true;
 
     // Navigation
