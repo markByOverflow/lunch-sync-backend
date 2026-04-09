@@ -1,66 +1,72 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace LunchSync.Core.Modules.Auth;
 
 public sealed record RegisterRequest(
-    string Email,
-    string Password,
-    string? FullName
+    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+
+    [property: Required, MinLength(6), JsonPropertyName("password")] string Password,
+
+    [property: JsonPropertyName("full_name")] string? FullName
 );
 
 public sealed record RegisterResponse(
-    Guid UserId,
-    string Email,
-    string? FullName,
-    string Role,
-    string Message
+    [property: JsonPropertyName("user_id")] Guid UserId,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName,
+    [property: JsonPropertyName("role")] string Role,
+    [property: JsonPropertyName("message")] string Message
 );
 
 public sealed record LoginRequest(
-    string Email,
-    string Password
+    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+
+    [property: Required, MinLength(6), JsonPropertyName("password")] string Password
 );
 
 public sealed record LoginResponse(
-    string AccessToken,
-    int ExpiresIn,
-    Guid UserId,
-    string Email,
-    string? FullName,
-    string Role
+    [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("expires_in")] int ExpiresIn,
+    [property: JsonPropertyName("user_id")] Guid UserId,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName,
+    [property: JsonPropertyName("role")] string Role
 );
 
 public sealed record CurrentActorResponse(
-    string? UserId,
-    string? Email,
-    string? Name,
-    string? ActorType,
-    IReadOnlyList<string> Roles
+    [property: JsonPropertyName("user_id")] string? UserId,
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("actor_type")] string? ActorType,
+    [property: JsonPropertyName("roles")] IReadOnlyList<string> Roles
 );
 
 public sealed record RegistrationStatusResponse(
-    string CognitoSub,
-    bool IsRegistered
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("is_registered")] bool IsRegistered
 );
 
 public sealed record CognitoRegisterResult(
-    string CognitoSub,
-    string Email,
-    string? FullName
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName
 );
 
 public sealed record CognitoLoginResult(
-    string AppBearerToken,
-    int ExpiresIn,
-    string CognitoSub,
-    string Email,
-    string? FullName
+    [property: JsonPropertyName("app_bearer_token")] string AppBearerToken,
+    [property: JsonPropertyName("expires_in")] int ExpiresIn,
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName
 );
 
 public sealed record GuestAccessTokenRequest(
-    string Nickname
+    [property: Required, JsonPropertyName("nickname")] string Nickname
 );
 
 public sealed record GuestAccessTokenResponse(
-    string Token,
-    DateTime ExpiresAtUtc,
-    string HeaderName
+    [property: JsonPropertyName("token")] string Token,
+    [property: JsonPropertyName("expires_at_utc")] DateTime ExpiresAtUtc,
+    [property: JsonPropertyName("header_name")] string HeaderName
 );
