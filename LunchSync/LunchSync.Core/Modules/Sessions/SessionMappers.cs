@@ -24,7 +24,7 @@ public static class SessionsMappers
             ParticipantId = participant.Id,
             SessionId = session.Id,
             Nickname = participant.Nickname,
-            Participants = session.Participants.Select(p => new ParticipantDto
+            Participants = session.Participants.Select(p => new ParticipantRes
             {
                 Nickname = p.Nickname,
                 JoinedAt = p.JoinedAt,
@@ -32,9 +32,9 @@ public static class SessionsMappers
             }).ToList()
         };
     }
-    public static SessionStatusDto ToStatusDto(this Session session)
+    public static SessionStatusRes ToStatusRes(this Session session)
     {
-        return new SessionStatusDto
+        return new SessionStatusRes
         {
             Status = session.Status.ToString().ToLower(),
             ParticipantsJoined = session.Participants.Count,
@@ -42,9 +42,9 @@ public static class SessionsMappers
             VotingStartedAt = session.VotingStartedAt
         };
     }
-    public static SessionInfoDto ToInfoDto(this Session session)
+    public static SessionInfoRes ToInfoRes(this Session session)
     {
-        return new SessionInfoDto
+        return new SessionInfoRes
         {
             SessionId = session.Id,
             Pin = session.Pin,
@@ -56,7 +56,7 @@ public static class SessionsMappers
             CollectionName = session.Collection?.Name ?? "Unknown Collection",
             PriceTier = session.PriceTier.ToString(),
             PriceDisplay = session.PriceTier.ToString() + "/phần",
-            Participants = session.Participants.Select(p => new ParticipantDto
+            Participants = session.Participants.Select(p => new ParticipantRes
             {
                 Nickname = p.Nickname,
                 JoinedAt = p.JoinedAt,

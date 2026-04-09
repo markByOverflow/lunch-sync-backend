@@ -93,32 +93,32 @@ public class SessionsController : ControllerBase
     }
 
     [AllowAnonymous]
-    [ProducesResponseType(typeof(SessionStatusDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SessionStatusRes), StatusCodes.Status200OK)]
     [HttpGet("{pin}/{sessionId:guid}/status")]
     public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
         var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
-        return Ok(session.ToStatusDto());
+        return Ok(session.ToStatusRes());
     }
 
     [AllowAnonymous]
     [HttpGet("{pin}/{sessionId:guid}/info")]
-    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SessionInfoRes), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
         var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
-        return Ok(session.ToInfoDto());
+        return Ok(session.ToInfoRes());
     }
 
     [AllowAnonymous]
     [HttpGet("history/{sessionId:guid}")]
-    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SessionInfoRes), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId, CancellationToken ct)
     {
         var session = await _sessionService.GetSessionHistoryAsync(sessionId, ct) ?? throw new SessionNotFoundByIdException(sessionId);
-        return Ok(session.ToInfoDto());
+        return Ok(session.ToInfoRes());
     }
 
     private async Task<Guid?> GetCurrentHostIdAsync(CancellationToken cancellationToken)
