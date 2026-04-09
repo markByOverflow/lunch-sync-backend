@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LunchSync.Api.Controllers;
 
 [ApiController]
-[Route("restaurants")]
+[Route("api/restaurants")]
 public class RestaurantsController : ControllerBase
 {
     private readonly IRestaurantService _restaurantService;
@@ -18,6 +18,7 @@ public class RestaurantsController : ControllerBase
     // GET /restaurants/{id}
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(RestaurantDetailRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRestaurantById(Guid id, CancellationToken ct)
     {
         var result = await _restaurantService.GetRestaurantWithDishesAsync(id, ct);

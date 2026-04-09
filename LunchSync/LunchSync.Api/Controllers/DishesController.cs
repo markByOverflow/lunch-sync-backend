@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LunchSync.Api.Controllers;
 
 [ApiController]
-[Route("dishes")]
+[Route("api/dishes")]
 public class DishesController : ControllerBase
 {
     private readonly IDishService _dishService;
@@ -18,6 +18,7 @@ public class DishesController : ControllerBase
     // GET /dishes?category={category}&search={search}
     [HttpGet]
     [ProducesResponseType(typeof(DishListRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDishes(
         [FromQuery] string? category,
         [FromQuery] string? search,
@@ -30,6 +31,7 @@ public class DishesController : ControllerBase
     // GET /dishes/{id}
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(DishDetailRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDishById(Guid id, CancellationToken ct)
     {
         var result = await _dishService.GetDishByIdAsync(id, ct);
