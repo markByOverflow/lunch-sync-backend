@@ -87,4 +87,14 @@ public static class SessionsMappers
             Message = $"Scoring với {session.GroupVector?.Count ?? 0} người đã vote"
         };
     }
+
+    public static SessionCancelRes ToCancelRes(this Session session)
+    {
+        return new SessionCancelRes
+        {
+            SessionId = session.Id,
+            Pin = session.Pin,
+            Status = session.Status.ToString().ToLower(),
+        };
+    }
 }

@@ -137,16 +137,18 @@ public class SessionService : ISessionService
         var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
         return sessionUpdate.ToStartRes();
     }
-    public async Task CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
+    public async Task<SessionCancelRes> CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)
     {
         var session = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
-        if (session.HostId == hostId)
+        if (session.HostId != hostId)
         {
             throw new NotHostException();
         }
         await _repository.UpdateSessionAsync(session, s => s.Status, SessionStatus.Cancelled);
         await _cache.RemoveSessionAsync(pin);
 
+        var sessionUpdate = await _repository.GetSessionByIdAsync(session.Id, ct) ?? throw new SessionNotFoundByIdException(session.Id);
+        return sessionUpdate.ToCancelRes();
     }
 
     //GET status+info => Object Session

@@ -156,3 +156,15 @@ public class SessionCloseVotingRes
     [JsonPropertyName("message")]
     public string Message { get; set; } = string.Empty;
 }
+
+public class SessionCancelRes
+{
+    [JsonPropertyName("session_id")]
+    public Guid SessionId { get; set; }
+
+    [JsonPropertyName("pin")]
+    public string Pin { get; set; } = string.Empty;
+
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = string.Empty;
+}
