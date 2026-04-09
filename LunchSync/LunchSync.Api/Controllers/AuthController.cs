@@ -1,4 +1,4 @@
-using LunchSync.Core.Common.Auth;
+﻿using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
@@ -43,6 +43,8 @@ public sealed class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
+    [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(
         [FromBody] RegisterRequest? request,
         CancellationToken cancellationToken)
@@ -63,6 +65,8 @@ public sealed class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest? request,
         CancellationToken cancellationToken)
@@ -83,6 +87,8 @@ public sealed class AuthController : ControllerBase
 
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpGet("registration-status")]
+    [ProducesResponseType(typeof(RegistrationStatusResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RegistrationStatus(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_currentUser.UserId))
