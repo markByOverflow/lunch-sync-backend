@@ -42,7 +42,7 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect(
                 configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false"));
 
-        //services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
         // Bind auth options once so token services va auth provider dung chung config.
