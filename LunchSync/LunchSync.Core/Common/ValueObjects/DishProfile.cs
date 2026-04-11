@@ -1,4 +1,4 @@
-namespace LunchSync.Core.Common.ValueObjects;
+﻿namespace LunchSync.Core.Common.ValueObjects;
 
 public sealed class DishProfile
 {
@@ -10,8 +10,6 @@ public sealed class DishProfile
     public double TextureComplexity { get; set; }
     public double TimeRequired { get; set; }
     public double Novelty { get; set; }
-    public double Healthy { get; set; }
-    public double Communal { get; set; }
 }
 
 
