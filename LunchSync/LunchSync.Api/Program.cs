@@ -19,7 +19,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Dang ky service business va ha tang cho toan bo app.
-        builder.Services.AddCore();
+        builder.Services.AddCoreServices();
         builder.Services.AddInfrastructure(builder.Configuration);
 
         builder.Services.AddControllers();
