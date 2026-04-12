@@ -1,4 +1,4 @@
-using LunchSync.Core.Modules.Auth;
+﻿using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.Sessions;
@@ -14,6 +14,8 @@ namespace LunchSync.Core
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICollectionService, CollectionService>();
             services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<IRestaurantService, RestaurantService>();
+            services.AddScoped<IDishService, DishService>();
 
             return services;
         }
