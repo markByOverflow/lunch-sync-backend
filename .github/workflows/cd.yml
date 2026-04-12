@@ -54,37 +54,58 @@ jobs:
           container-name: lunchsync-backend # Phải khớp với tên trong AWS Console
           image: ${{ steps.build-image.outputs.image }}
 
+      - name: Register updated Task Definition
+        id: register-td
+        run: |
+          TD_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ steps.task-def.outputs.task-definition }} \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "td_arn=$TD_ARN" >> $GITHUB_OUTPUT
+
       # Chạy Task để seed dữ liệu
       - name: Run Database Seed Task
+        id: run-seed
         run: |
-          aws ecs run-task \
+          # Chạy task và lấy Task ARN
+          TASK_ARN=$(aws ecs run-task \
             --cluster ${{ secrets.ECS_CLUSTER }} \
-            --task-definition lunchsync-backend \
+            --task-definition ${{ steps.register-td.outputs.td_arn }} \
             --launch-type FARGATE \
-            --network-configuration '{
-              "awsvpcConfiguration": {
-                "subnets": ["${{ secrets.PRIVATE_SUBNET_1 }}", "${{ secrets.PRIVATE_SUBNET_2 }}"],
-                "securityGroups": ["${{ secrets.BACKEND_SG_ID }}"],
-                "assignPublicIp": "DISABLED"
-              }
-            }' \
-            --overrides '{
-              "containerOverrides": [
-                {
+            --network-configuration '{"awsvpcConfiguration": {"subnets": ["${{ secrets.PRIVATE_SUBNET_1 }}"],"securityGroups": ["${{ secrets.BACKEND_SG_ID }}"],"assignPublicIp": "DISABLED"}}' \
+            --overrides '{"containerOverrides": [
+              {
                   "name": "lunchsync-backend",
-                  "command": ["python", "AddData.py"],
+                  "command": ["python3", "AddData.py"],
                   "environment": [
                     {"name": "DB_HOST", "value": "${{ secrets.DB_HOST }}"},
                     {"name": "DB_NAME", "value": "${{ secrets.DB_NAME }}"},
                     {"name": "DB_USER", "value": "${{ secrets.DB_USER }}"},
-                    {"name": "DB_PASS", "value": "${{ secrets.DB_PASS }}"}
+                    {"name": "DB_PASS", "value": "${{ secrets.DB_PASS }}"},
+                    {"name": "DB_PORT", "value": "5432"}
                   ]
                 }
               ]
-            }'
+            }' \
+            --query 'tasks[0].taskArn' --output text)
+          
+          echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
 
       - name: Wait for Seed Task to complete
-        run: sleep 30
+        run: |
+          aws ecs wait tasks-stopped \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --tasks ${{ steps.run-seed.outputs.task_arn }}
+          
+          # Kiểm tra xem task dừng vì thành công hay thất bại
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster ${{ secrets.ECS_CLUSTER }} \
+            --tasks ${{ steps.run-seed.outputs.task_arn }} \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "Seed Task failed or crashed!"
+            exit 1
+          fi
       
       # Deploy lên ECS
       - name: Deploy to Amazon ECS

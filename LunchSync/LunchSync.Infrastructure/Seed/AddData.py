@@ -128,6 +128,8 @@ def migrate_data():
     except Exception as e:
         conn.rollback()
         print(f"✗ Lỗi rồi: {e}")
+        import sys
+        sys.exit(1)
     finally:
         cur.close()
         conn.close()

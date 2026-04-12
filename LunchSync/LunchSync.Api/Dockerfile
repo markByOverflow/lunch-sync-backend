@@ -30,11 +30,21 @@ RUN dotnet publish "LunchSync.Api.csproj" -c Release -o /app/publish /p:UseAppHo
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install psycopg2-binary --break-system-packages
+
 COPY --from=build /root/.dotnet/tools /root/.dotnet/tools
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Copy DLL migrations
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet"]
-CMD ["LunchSync.Api.dll"]
+COPY LunchSync.Infrastructure/Seed/AddData.py .
+COPY LunchSync.Infrastructure/Seed/*.json .
+
+#ENTRYPOINT ["dotnet"]
+CMD ["dotnet", "LunchSync.Api.dll"]
