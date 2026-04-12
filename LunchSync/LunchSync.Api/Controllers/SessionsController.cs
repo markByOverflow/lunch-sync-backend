@@ -33,6 +33,7 @@ public class SessionsController : ControllerBase
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpPost]
     [ProducesResponseType(typeof(CreateSessionRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync([FromBody] CreateSessionReq request, CancellationToken ct)
     {
         // Controller map principal -> local user id, business rule de service xu ly.
@@ -49,6 +50,7 @@ public class SessionsController : ControllerBase
     [AllowAnonymous]
     [HttpPost("{pin}/join")]
     [ProducesResponseType(typeof(JoinRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request, CancellationToken ct)
     {
         // Guest join bang PIN va nickname, chua can host JWT.
@@ -62,6 +64,7 @@ public class SessionsController : ControllerBase
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpPost("{pin}/start")]
     [ProducesResponseType(typeof(SessionStartRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> StartAsync([FromRoute] string pin, CancellationToken ct)
     {
         var hostId = await GetCurrentHostIdAsync(ct);
@@ -78,6 +81,8 @@ public class SessionsController : ControllerBase
     // Chi host moi duoc huy session.
     [Authorize(Policy = AuthPolicies.CognitoUser)]
     [HttpPost("{pin}/cancel")]
+    [ProducesResponseType(typeof(SessionCancelRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CancelAsync(
         [FromRoute] string pin,
         CancellationToken ct)
@@ -88,37 +93,40 @@ public class SessionsController : ControllerBase
             return Unauthorized();
         }
 
-        await _sessionService.CancelSessionAsync(pin, hostId.Value, ct);
-        return Ok();
+        var result = await _sessionService.CancelSessionAsync(pin, hostId.Value, ct);
+        return Ok(result);
     }
 
     [AllowAnonymous]
-    [ProducesResponseType(typeof(SessionStatusDto), StatusCodes.Status200OK)]
     [HttpGet("{pin}/{sessionId:guid}/status")]
+    [ProducesResponseType(typeof(SessionStatusRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStatusAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
         var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
-        return Ok(session.ToStatusDto());
+        return Ok(session.ToStatusRes());
     }
 
     [AllowAnonymous]
     [HttpGet("{pin}/{sessionId:guid}/info")]
-    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SessionInfoRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetInfoAsync([FromRoute] string pin, CancellationToken ct)
     {
         var validPin = Pin.Create(pin);
         var session = await _sessionService.GetSessionAsync(validPin.Value, ct) ?? throw new SessionExpiredException();
-        return Ok(session.ToInfoDto());
+        return Ok(session.ToInfoRes());
     }
 
     [AllowAnonymous]
     [HttpGet("history/{sessionId:guid}")]
-    [ProducesResponseType(typeof(SessionInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SessionInfoRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHistoryAsync([FromRoute] Guid sessionId, CancellationToken ct)
     {
         var session = await _sessionService.GetSessionHistoryAsync(sessionId, ct) ?? throw new SessionNotFoundByIdException(sessionId);
-        return Ok(session.ToInfoDto());
+        return Ok(session.ToInfoRes());
     }
 
     private async Task<Guid?> GetCurrentHostIdAsync(CancellationToken cancellationToken)

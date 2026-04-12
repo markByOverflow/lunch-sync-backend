@@ -1,31 +1,37 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace LunchSync.Core.Modules.Auth;
 
 public sealed record RegisterRequest(
-    string Email,
-    string Password,
-    string? FullName
+    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+
+    [property: Required, MinLength(6), JsonPropertyName("password")] string Password,
+
+    [property: JsonPropertyName("full_name")] string? FullName
 );
 
 public sealed record RegisterResponse(
-    Guid UserId,
-    string Email,
-    string? FullName,
-    string Role,
-    string Message
+    [property: JsonPropertyName("user_id")] Guid UserId,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName,
+    [property: JsonPropertyName("role")] string Role,
+    [property: JsonPropertyName("message")] string Message
 );
 
 public sealed record LoginRequest(
-    string Email,
-    string Password
+    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+
+    [property: Required, MinLength(6), JsonPropertyName("password")] string Password
 );
 
 public sealed record LoginResponse(
-    string AccessToken,
-    int ExpiresIn,
-    Guid UserId,
-    string Email,
-    string? FullName,
-    string Role
+    [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("expires_in")] int ExpiresIn,
+    [property: JsonPropertyName("user_id")] Guid UserId,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName,
+    [property: JsonPropertyName("role")] string Role
 );
 
 public sealed record CurrentUserResponse(
@@ -38,9 +44,9 @@ public sealed record CurrentUserResponse(
 );
 
 public sealed record CognitoRegisterResult(
-    string CognitoSub,
-    string Email,
-    string? FullName
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName
 );
 
 public sealed record CognitoLoginResult(

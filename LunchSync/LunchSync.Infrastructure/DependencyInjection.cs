@@ -41,6 +41,8 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect(
                 configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false"));
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IDishRepository, DishRepository>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();

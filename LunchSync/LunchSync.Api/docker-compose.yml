@@ -1,0 +1,25 @@
+services:
+  # Dịch vụ PostgreSQL
+  db:
+    image: postgres:latest
+    container_name: lunchsync-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: lunchsync
+      POSTGRES_PASSWORD: Password@123
+      POSTGRES_DB: lunchsync_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  # Dịch vụ Redis
+  redis-cache:
+    image: redis:alpine
+    container_name: lunchsync-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

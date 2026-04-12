@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\LunchSync.Core\LunchSync.Core.csproj" />
     <ProjectReference Include="..\LunchSync.Infrastructure\LunchSync.Infrastructure.csproj" />
   </ItemGroup>

@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Modules\VotingAndScoring\Entities\**" />
+    <EmbeddedResource Remove="Modules\VotingAndScoring\Entities\**" />
+    <None Remove="Modules\VotingAndScoring\Entities\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Modules\Auth\Entities\" />
-    <Folder Include="Modules\VotingAndScoring\Entities\" />
   </ItemGroup>
 
   <ItemGroup>

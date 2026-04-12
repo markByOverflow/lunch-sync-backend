@@ -1,4 +1,4 @@
-using LunchSync.Core.Common.Auth;
+﻿using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Core.Modules.Auth;
 using LunchSync.Core.Modules.Auth.Interfaces;
@@ -42,6 +42,8 @@ public sealed class AuthController : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("auth-public")]
     [HttpPost("register")]
+    [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(
         [FromBody] RegisterRequest? request,
         CancellationToken cancellationToken)
@@ -55,6 +57,8 @@ public sealed class AuthController : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("auth-public")]
     [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest? request,
         CancellationToken cancellationToken)

@@ -1,0 +1,653 @@
+[
+  {
+    "restaurant_id": 118,
+    "dishes": [
+      "d83ed636-2589-4ae3-8dfa-78e509044b76"
+    ]
+  },
+  {
+    "restaurant_id": 865,
+    "dishes": [
+      "20342cca-3bf5-4f5b-9229-2ec1cbb59957",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 1173,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f"
+    ]
+  },
+  {
+    "restaurant_id": 1377,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1391,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76"
+    ]
+  },
+  {
+    "restaurant_id": 1559,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68"
+    ]
+  },
+  {
+    "restaurant_id": 1728,
+    "dishes": [
+      "98f78734-5a0c-4404-810d-aad34f4e3a2e",
+      "d0190fa4-51b4-420e-8386-ef4241a1b562"
+    ]
+  },
+  {
+    "restaurant_id": 1777,
+    "dishes": [
+      "73245843-c77b-4453-b4a2-0e4c3085b926",
+      "d0190fa4-51b4-420e-8386-ef4241a1b562"
+    ]
+  },
+  {
+    "restaurant_id": 2179,
+    "dishes": [
+      "b9f1fc61-e4cc-44c3-a7dd-db3a6ca9b3f9"
+    ]
+  },
+  {
+    "restaurant_id": 3188,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "251c81df-c444-47db-a0e9-ca7fe1f2e2b8",
+      "292bd453-6529-4274-b9b8-af4fed8ea731",
+      "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+      "73245843-c77b-4453-b4a2-0e4c3085b926",
+      "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee",
+      "cc3b4294-c634-45a9-8254-302c23004dcd"
+    ]
+  },
+  {
+    "restaurant_id": 3244,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 4075,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6"
+    ]
+  },
+  {
+    "restaurant_id": 4209,
+    "dishes": [
+      "ca787209-2543-43d2-bfe5-e4a40aa7f32d"
+    ]
+  },
+  {
+    "restaurant_id": 4237,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 4242,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 4479,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62"
+    ]
+  },
+  {
+    "restaurant_id": 5129,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f"
+    ]
+  },
+  {
+    "restaurant_id": 5621,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211"
+    ]
+  },
+  {
+    "restaurant_id": 10337,
+    "dishes": [
+      "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7"
+    ]
+  },
+  {
+    "restaurant_id": 14539,
+    "dishes": [
+      "5a999130-ec3e-4f47-8e35-b10aaf0d5636",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 16944,
+    "dishes": [
+      "492149f1-31c2-4a1e-a2b8-3a561ef3a646"
+    ]
+  },
+  {
+    "restaurant_id": 18346,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62"
+    ]
+  },
+  {
+    "restaurant_id": 18892,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "9549caee-2a3e-47c4-b084-d5e92db79ad6",
+      "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 33798,
+    "dishes": [
+      "60fc35fd-e246-409b-8296-2ca71c89213a",
+      "8602edd9-4c07-41a3-ae02-742f16c7bc04",
+      "cb655a47-0295-4c3d-9f03-8fe8309a874b"
+    ]
+  },
+  {
+    "restaurant_id": 36581,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 49062,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68"
+    ]
+  },
+  {
+    "restaurant_id": 86993,
+    "dishes": [
+      "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7"
+    ]
+  },
+  {
+    "restaurant_id": 89902,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 90018,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "d0190fa4-51b4-420e-8386-ef4241a1b562",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 90881,
+    "dishes": [
+      "cc3b4294-c634-45a9-8254-302c23004dcd"
+    ]
+  },
+  {
+    "restaurant_id": 104663,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f"
+    ]
+  },
+  {
+    "restaurant_id": 126712,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 131876,
+    "dishes": [
+      "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76"
+    ]
+  },
+  {
+    "restaurant_id": 156532,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f"
+    ]
+  },
+  {
+    "restaurant_id": 163586,
+    "dishes": [
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76"
+    ]
+  },
+  {
+    "restaurant_id": 165559,
+    "dishes": [
+      "96976e89-fe12-4bf4-8c57-eedc92e988b0",
+      "ca787209-2543-43d2-bfe5-e4a40aa7f32d"
+    ]
+  },
+  {
+    "restaurant_id": 201010,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 222076,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 270175,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211",
+      "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7"
+    ]
+  },
+  {
+    "restaurant_id": 277439,
+    "dishes": [
+      "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee"
+    ]
+  },
+  {
+    "restaurant_id": 283796,
+    "dishes": [
+      "8d91a500-a03f-4d94-b83c-c3eef2173689"
+    ]
+  },
+  {
+    "restaurant_id": 299844,
+    "dishes": [
+      "5a999130-ec3e-4f47-8e35-b10aaf0d5636",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29",
+      "8a824fbd-97d7-4dc0-b78e-30c0f3933f1f",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 311389,
+    "dishes": [
+      "60fc35fd-e246-409b-8296-2ca71c89213a",
+      "709c205d-e29c-4823-a4ff-5a6a7e6acf0d",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 316252,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211",
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 689037,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 689338,
+    "dishes": [
+      "84b34a8f-ee04-4ab2-98dc-9abb507b9d35",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 694996,
+    "dishes": [
+      "e723d181-21dd-4d8a-8824-146a2b0a01fa"
+    ]
+  },
+  {
+    "restaurant_id": 711778,
+    "dishes": [
+      "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6"
+    ]
+  },
+  {
+    "restaurant_id": 737536,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "d0190fa4-51b4-420e-8386-ef4241a1b562",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 752753,
+    "dishes": [
+      "3b26d250-6614-42e3-a1ea-4285a8cc7c39",
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "e73c65f0-4346-4d07-8ca1-5816e9b2883d",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5",
+      "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7"
+    ]
+  },
+  {
+    "restaurant_id": 761695,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "5a999130-ec3e-4f47-8e35-b10aaf0d5636",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 765370,
+    "dishes": [
+      "8d91a500-a03f-4d94-b83c-c3eef2173689"
+    ]
+  },
+  {
+    "restaurant_id": 768589,
+    "dishes": [
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 773490,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6"
+    ]
+  },
+  {
+    "restaurant_id": 804450,
+    "dishes": [
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 879848,
+    "dishes": [
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 888481,
+    "dishes": [
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7"
+    ]
+  },
+  {
+    "restaurant_id": 897041,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "eabb661c-ac0b-4a83-b083-efe68df3b775"
+    ]
+  },
+  {
+    "restaurant_id": 897391,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211"
+    ]
+  },
+  {
+    "restaurant_id": 899747,
+    "dishes": [
+      "b9f1fc61-e4cc-44c3-a7dd-db3a6ca9b3f9"
+    ]
+  },
+  {
+    "restaurant_id": 903641,
+    "dishes": [
+      "8e740ae4-24c0-495a-937e-e1da5de60e09"
+    ]
+  },
+  {
+    "restaurant_id": 913329,
+    "dishes": [
+      "57e4c0f1-f181-4402-9352-96a4acd87194",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 919669,
+    "dishes": [
+      "5d2a8c99-b929-4a6f-b278-e9754c287e68",
+      "78ec3239-e78c-4cc9-a783-a7600896fe29",
+      "e723d181-21dd-4d8a-8824-146a2b0a01fa"
+    ]
+  },
+  {
+    "restaurant_id": 932823,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62"
+    ]
+  },
+  {
+    "restaurant_id": 951847,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 952602,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "621dc429-b703-45f5-8baa-829029057a3f",
+      "847bf30e-6845-473a-8b8c-cf039e5b3457",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 955901,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29",
+      "e723d181-21dd-4d8a-8824-146a2b0a01fa"
+    ]
+  },
+  {
+    "restaurant_id": 957716,
+    "dishes": [
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee",
+      "ca787209-2543-43d2-bfe5-e4a40aa7f32d",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "db81ab9a-ef6c-4da9-9962-1b24ca1e68d7",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 964581,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 967124,
+    "dishes": [
+      "20342cca-3bf5-4f5b-9229-2ec1cbb59957",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 969341,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "98f78734-5a0c-4404-810d-aad34f4e3a2e",
+      "f446bc1c-ec8c-4b73-8473-49a629109cc8"
+    ]
+  },
+  {
+    "restaurant_id": 976186,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 1000501,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1002020,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 1020517,
+    "dishes": [
+      "78ec3239-e78c-4cc9-a783-a7600896fe29"
+    ]
+  },
+  {
+    "restaurant_id": 1025005,
+    "dishes": [
+      "ab925aef-15b7-4b60-a20e-8ced7dd01009"
+    ]
+  },
+  {
+    "restaurant_id": 1039876,
+    "dishes": [
+      "709c205d-e29c-4823-a4ff-5a6a7e6acf0d",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "cb655a47-0295-4c3d-9f03-8fe8309a874b",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 1041470,
+    "dishes": [
+      "e723d181-21dd-4d8a-8824-146a2b0a01fa"
+    ]
+  },
+  {
+    "restaurant_id": 1049330,
+    "dishes": [
+      "16e5af8e-71b8-4566-a6c4-9990ed446211",
+      "56cec4aa-fc07-4cb7-be7f-28df4571d751",
+      "709c205d-e29c-4823-a4ff-5a6a7e6acf0d",
+      "c7a79da3-2a13-41c8-bd21-ec467f5b17a7",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 1053085,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1054017,
+    "dishes": [
+      "8a824fbd-97d7-4dc0-b78e-30c0f3933f1f",
+      "be31e376-b4c8-463e-90ae-6cfb64c758d6",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ef5a087f-2c55-4bfb-9e63-f1d3f32016e5"
+    ]
+  },
+  {
+    "restaurant_id": 1069850,
+    "dishes": [
+      "3b26d250-6614-42e3-a1ea-4285a8cc7c39"
+    ]
+  },
+  {
+    "restaurant_id": 1074245,
+    "dishes": [
+      "ff487652-b943-4107-ae11-3d0d19f2a6d5"
+    ]
+  },
+  {
+    "restaurant_id": 1077801,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1104253,
+    "dishes": [
+      "c2baaf46-4dbc-450e-832f-1ca6f2d2dbee",
+      "f8c3b38a-862c-42d7-92b8-0bc55dfc90a7"
+    ]
+  },
+  {
+    "restaurant_id": 1107278,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1156744,
+    "dishes": [
+      "223247a7-c7ae-43fe-87ed-6ca01b208c62"
+    ]
+  },
+  {
+    "restaurant_id": 1000023020,
+    "dishes": [
+      "59e826b6-7c03-45fc-a22e-4679abfc326f",
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f",
+      "ff487652-b943-4107-ae11-3d0d19f2a6d5"
+    ]
+  },
+  {
+    "restaurant_id": 1000025639,
+    "dishes": [
+      "251c81df-c444-47db-a0e9-ca7fe1f2e2b8",
+      "d83ed636-2589-4ae3-8dfa-78e509044b76"
+    ]
+  },
+  {
+    "restaurant_id": 1000072185,
+    "dishes": [
+      "ed63877f-5aa2-410a-9d9b-c4dd6474793f"
+    ]
+  },
+  {
+    "restaurant_id": 1000073638,
+    "dishes": [
+      "3fea11d1-ecad-4ba5-b10b-df20442cc3e5"
+    ]
+  }
+]

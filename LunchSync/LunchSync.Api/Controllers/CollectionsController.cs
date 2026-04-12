@@ -17,6 +17,8 @@ public class CollectionsController : ControllerBase
 
     // GET /api/collections
     [HttpGet]
+    [ProducesResponseType(typeof(CollectionSummaryRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAll()
     {
         var result = await _collectionService.GetAllActiveCollectionsAsync();
@@ -25,6 +27,8 @@ public class CollectionsController : ControllerBase
 
     // GET /api/collections/{id}
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(CollectionDetailRes), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         var result = await _collectionService.GetCollectionDetailAsync(id);

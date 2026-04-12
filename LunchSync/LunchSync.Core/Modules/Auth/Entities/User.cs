@@ -1,4 +1,4 @@
-using LunchSync.Core.Common.Abstractions;
+﻿using LunchSync.Core.Common.Abstractions;
 using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Entities;
 namespace LunchSync.Core.Modules.Auth.Entities;
@@ -11,6 +11,4 @@ public class User : BaseEntity
     public UserRole Role { get; set; } = UserRole.User;
     public bool IsActive { get; set; } = true;
 
-    // Navigation
-    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }
