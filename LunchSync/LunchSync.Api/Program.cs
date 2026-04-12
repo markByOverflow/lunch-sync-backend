@@ -1,10 +1,13 @@
-using LunchSync.Api.Authentication;
+﻿using LunchSync.Api.Authentication;
 using LunchSync.Api.Middleware;
 using LunchSync.Api.Services;
 using LunchSync.Core;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Infrastructure;
+using LunchSync.Infrastructure.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 namespace LunchSync.Api;
@@ -20,6 +23,19 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
 
         builder.Services.AddControllers();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend",
+                policy =>
+                {
+                    policy.WithOrigins("https://lunchsync.space") // Domain FE của bạn
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
+
         builder.Services.AddEndpointsApiExplorer();
         // Cau hinh auth theo JWT cho host/user va guest.
         builder.Services.AddLunchSyncAuthentication(builder.Configuration);
@@ -79,13 +95,32 @@ public class Program
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "LunchSync API v1");
                 c.RoutePrefix = string.Empty;
             });
+            app.UseHttpsRedirection();
         }
 
-        app.UseHttpsRedirection();
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+
+            try
+            {
+                var context = services.GetRequiredService<AppDbContext>();
+                Console.WriteLine($"[DEBUG] DB Connection: {context.Database.GetDbConnection().DataSource} | DB Name: {context.Database.GetDbConnection().Database}");
+                Console.WriteLine("[STARTUP] Running migrations...");
+                context.Database.Migrate();
+                Console.WriteLine("Migrations finished!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Migration failed: " + ex.Message);
+                throw;
+            }
+        }
+
 
         // Gom loi domain/unhandled ve mot format response thong nhat.
         app.UseGlobalExceptionHandler();
-
+        app.UseCors("AllowFrontend");
         // Xac thuc truoc, phan quyen sau.
         app.UseAuthentication();
         app.UseAuthorization();
