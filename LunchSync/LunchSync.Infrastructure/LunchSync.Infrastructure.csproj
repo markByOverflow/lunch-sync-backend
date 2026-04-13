@@ -24,4 +24,10 @@
     <ProjectReference Include="..\LunchSync.Core\LunchSync.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Seed/*.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

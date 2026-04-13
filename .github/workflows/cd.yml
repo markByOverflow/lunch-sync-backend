@@ -53,38 +53,6 @@ jobs:
           task-definition: td.json
           container-name: lunchsync-backend # Phải khớp với tên trong AWS Console
           image: ${{ steps.build-image.outputs.image }}
-
-      # Chạy Task để seed dữ liệu
-      - name: Run Database Seed Task
-        run: |
-          aws ecs run-task \
-            --cluster ${{ secrets.ECS_CLUSTER }} \
-            --task-definition lunchsync-backend \
-            --launch-type FARGATE \
-            --network-configuration '{
-              "awsvpcConfiguration": {
-                "subnets": ["${{ secrets.PRIVATE_SUBNET_1 }}", "${{ secrets.PRIVATE_SUBNET_2 }}"],
-                "securityGroups": ["${{ secrets.BACKEND_SG_ID }}"],
-                "assignPublicIp": "DISABLED"
-              }
-            }' \
-            --overrides '{
-              "containerOverrides": [
-                {
-                  "name": "lunchsync-backend",
-                  "command": ["python", "AddData.py"],
-                  "environment": [
-                    {"name": "DB_HOST", "value": "${{ secrets.DB_HOST }}"},
-                    {"name": "DB_NAME", "value": "${{ secrets.DB_NAME }}"},
-                    {"name": "DB_USER", "value": "${{ secrets.DB_USER }}"},
-                    {"name": "DB_PASS", "value": "${{ secrets.DB_PASS }}"}
-                  ]
-                }
-              ]
-            }'
-
-      - name: Wait for Seed Task to complete
-        run: sleep 30
       
       # Deploy lên ECS
       - name: Deploy to Amazon ECS
