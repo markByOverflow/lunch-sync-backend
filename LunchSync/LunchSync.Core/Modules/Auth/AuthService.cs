@@ -75,18 +75,15 @@ public sealed class AuthService : IAuthService
         var normalizedEmail = NormalizeAndValidateVerifyOtpRequest(request);
         var pendingRegistration = await _pendingRegistrationStore.GetAsync(normalizedEmail, cancellationToken);
 
-        if (pendingRegistration is null)
-        {
-            throw new ValidationException(
-                "Khong tim thay dang ky cho email nay.",
-                new Dictionary<string, string> { ["email"] = "Thong tin dang ky da het han. Vui long dang ky lai." });
-        }
-
         await _cognitoAuthProvider.ConfirmSignUpAsync(
             request with { Email = normalizedEmail, Otp = request.Otp.Trim() },
             cancellationToken);
 
-        await SyncLocalUserForConfirmedRegistrationAsync(pendingRegistration, cancellationToken);
+        if (pendingRegistration is not null)
+        {
+            await SyncLocalUserForConfirmedRegistrationAsync(pendingRegistration, cancellationToken);
+        }
+
         await _pendingRegistrationStore.RemoveAsync(normalizedEmail, cancellationToken);
 
         return new VerifyOtpResponse(
@@ -101,18 +98,14 @@ public sealed class AuthService : IAuthService
         var normalizedEmail = NormalizeAndValidateResendOtpRequest(request);
         var pendingRegistration = await _pendingRegistrationStore.GetAsync(normalizedEmail, cancellationToken);
 
-        if (pendingRegistration is null)
-        {
-            throw new ValidationException(
-                "Khong tim thay dang ky cho email nay.",
-                new Dictionary<string, string> { ["email"] = "Thong tin dang ky da het han. Vui long dang ky lai." });
-        }
-
         await _cognitoAuthProvider.ResendConfirmationCodeAsync(
             request with { Email = normalizedEmail },
             cancellationToken);
 
-        await _pendingRegistrationStore.SaveAsync(pendingRegistration, cancellationToken);
+        if (pendingRegistration is not null)
+        {
+            await _pendingRegistrationStore.SaveAsync(pendingRegistration, cancellationToken);
+        }
 
         return new ResendOtpResponse(
             normalizedEmail,
@@ -306,9 +299,12 @@ public sealed class AuthService : IAuthService
             return await SyncUserProfileAsync(existingByEmail, cognitoResult, cancellationToken);
         }
 
-        throw new ValidationException(
-            "Tai khoan chua duoc dong bo vao he thong.",
-            new Dictionary<string, string> { ["email"] = "Vui long xac thuc OTP truoc khi dang nhap." });
+        return await _userRepository.AddAsync(new User
+        {
+            CognitoSub = cognitoResult.CognitoSub,
+            Email = cognitoResult.Email,
+            FullName = cognitoResult.FullName?.Trim()
+        }, cancellationToken);
     }
 
     private async Task<User> SyncRegisteredUserProfileAsync(
