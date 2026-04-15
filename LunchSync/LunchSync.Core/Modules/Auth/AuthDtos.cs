@@ -4,9 +4,11 @@ using System.Text.Json.Serialization;
 namespace LunchSync.Core.Modules.Auth;
 
 public sealed record RegisterRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
+    [property: JsonPropertyName("email")] string Email,
 
-    [property: Required, MinLength(6), JsonPropertyName("password")] string Password,
+    [param: Required(ErrorMessage = "Mat khau la bat buoc."), MinLength(6, ErrorMessage = "Mat khau phai co it nhat 6 ky tu.")]
+    [property: JsonPropertyName("password")] string Password,
 
     [property: JsonPropertyName("full_name")] string? FullName
 );
@@ -18,8 +20,10 @@ public sealed record RegisterResponse(
 );
 
 public sealed record VerifyOtpRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
-    [property: Required, MinLength(6), JsonPropertyName("otp")] string Otp
+    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
+    [property: JsonPropertyName("email")] string Email,
+    [param: Required(ErrorMessage = "Ma OTP la bat buoc."), MinLength(6, ErrorMessage = "Ma OTP phai co it nhat 6 ky tu.")]
+    [property: JsonPropertyName("otp")] string Otp
 );
 
 public sealed record VerifyOtpResponse(
@@ -28,7 +32,8 @@ public sealed record VerifyOtpResponse(
 );
 
 public sealed record ResendOtpRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email
+    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
+    [property: JsonPropertyName("email")] string Email
 );
 
 public sealed record ResendOtpResponse(
@@ -37,9 +42,11 @@ public sealed record ResendOtpResponse(
 );
 
 public sealed record LoginRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
+    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
+    [property: JsonPropertyName("email")] string Email,
 
-    [property: Required, MinLength(6), JsonPropertyName("password")] string Password
+    [param: Required(ErrorMessage = "Mat khau la bat buoc."), MinLength(6, ErrorMessage = "Mat khau phai co it nhat 6 ky tu.")]
+    [property: JsonPropertyName("password")] string Password
 );
 
 public sealed record LoginResponse(
@@ -67,9 +74,9 @@ public sealed record CognitoRegisterResult(
 );
 
 public sealed record CognitoLoginResult(
-    string AccessToken,
-    int ExpiresIn,
-    string CognitoSub,
-    string Email,
-    string? FullName
+    [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("expires_in")] int ExpiresIn,
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName
 );

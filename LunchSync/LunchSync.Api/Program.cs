@@ -6,6 +6,7 @@ using LunchSync.Core;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using LunchSync.Infrastructure.Persistence;
 
@@ -24,7 +25,30 @@ public class Program
         builder.Services.AddCoreServices();
         builder.Services.AddInfrastructure(builder.Configuration);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var details = context.ModelState
+                        .Where(entry => entry.Value is not null && entry.Value.Errors.Count > 0)
+                        .ToDictionary(
+                            entry => string.IsNullOrWhiteSpace(entry.Key)
+                                ? "request"
+                                : char.ToLowerInvariant(entry.Key[0]) + entry.Key[1..],
+                            entry => string.Join(" ", entry.Value!.Errors.Select(error => error.ErrorMessage)));
+
+                    return new BadRequestObjectResult(new
+                    {
+                        error = new
+                        {
+                            code = "VALIDATION_ERROR",
+                            message = "Du lieu dau vao khong hop le.",
+                            details
+                        }
+                    });
+                };
+            });
 
         builder.Services.AddCors(options =>
         {
