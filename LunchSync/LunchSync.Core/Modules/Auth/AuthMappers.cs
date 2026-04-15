@@ -1,4 +1,4 @@
-using LunchSync.Core.Modules.Auth.Entities;
+﻿using LunchSync.Core.Modules.Auth.Entities;
 
 namespace LunchSync.Core.Modules.Auth;
 
@@ -7,10 +7,8 @@ public static class AuthMappers
     public static RegisterResponse ToRegisterResponse(this User user, string message)
     {
         return new RegisterResponse(
-            user.Id,
             user.Email,
             user.FullName,
-            user.Role.ToString().ToLowerInvariant(),
             message
         );
     }
