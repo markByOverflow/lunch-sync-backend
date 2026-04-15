@@ -34,14 +34,21 @@ public class DishRepository : IDishRepository
         var query = _context.Dishes.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-            query = query.Where(d => d.Name.Contains(searchTerm) || d.Category.Contains(searchTerm));
+        {
+            query = query.Where(d => EF.Functions.ILike(d.Name, $"%{searchTerm}%")
+                                  || EF.Functions.ILike(d.Category, $"%{searchTerm}%"));
+        }
 
+        // 2. Lọc theo category
         if (!string.IsNullOrWhiteSpace(category))
-            query = query.Where(d => d.Category == category);
+        {
+            // Dùng ILike để gõ "cơm" hay "Cơm" đều ra "Cơm"
+            query = query.Where(d => EF.Functions.ILike(d.Category, $"%{category}%"));
+        }
 
         return await query
             .OrderBy(d => d.Name)
-            .Take(5)
+            //.Take(5)
             .ToListAsync(ct);
     }
 

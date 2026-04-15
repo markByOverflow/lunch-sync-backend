@@ -20,6 +20,8 @@ public class RestaurantRepository : IRestaurantRepository
         return await _context.Restaurants
             .Include(r => r.RestaurantDishes)      // Vào bảng trung gian
                 .ThenInclude(rd => rd.Dish)        // Vào bảng Dish để lấy Name
+            .Include(r => r.RestaurantCollections)
+                .ThenInclude(rc => rc.Collection)
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, ct);
     }
@@ -33,6 +35,8 @@ public class RestaurantRepository : IRestaurantRepository
         return await _context.Restaurants
             .Include(r => r.RestaurantDishes)
                 .ThenInclude(rd => rd.Dish)
+            .Include(r => r.RestaurantCollections)
+                .ThenInclude(rc => rc.Collection)
             .Where(r => ids.Contains(r.Id))
             .AsNoTracking()
             .ToListAsync(ct);
