@@ -1,5 +1,7 @@
 using System.Security.Claims;
+using LunchSync.Core.Modules.Auth.Entities;
 using LunchSync.Core.Common.Auth;
+using LunchSync.Core.Exceptions;
 using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,9 +74,39 @@ public static class JwtAuthenticationExtensions
 
                     var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
                     var localUser = await userRepository.GetByCognitoSubAsync(subject, context.HttpContext.RequestAborted);
-                    if (localUser is null || !localUser.IsActive)
+                    if (localUser is null)
                     {
-                        context.Fail("Local user is missing or inactive.");
+                        var cognitoAuthProvider = context.HttpContext.RequestServices.GetRequiredService<ICognitoAuthProvider>();
+                        var accessToken = ReadBearerToken(context.HttpContext.Request.Headers.Authorization.ToString());
+                        if (string.IsNullOrWhiteSpace(accessToken))
+                        {
+                            context.Fail("Missing bearer token.");
+                            return;
+                        }
+
+                        try
+                        {
+                            var cognitoProfile = await cognitoAuthProvider.GetUserProfileAsync(
+                                accessToken,
+                                context.HttpContext.RequestAborted);
+
+                            localUser = await SyncLocalUserFromCognitoAsync(
+                                userRepository,
+                                subject,
+                                cognitoProfile.Email,
+                                cognitoProfile.FullName,
+                                context.HttpContext.RequestAborted);
+                        }
+                        catch
+                        {
+                            context.Fail("Local user is missing and could not be synchronized from Cognito.");
+                            return;
+                        }
+                    }
+
+                    if (!localUser.IsActive)
+                    {
+                        context.Fail("Local user is inactive.");
                         return;
                     }
 
@@ -108,5 +140,74 @@ public static class JwtAuthenticationExtensions
         }
 
         identity.AddClaim(new Claim(claimType, value));
+    }
+
+    private static string? ReadBearerToken(string? authorizationHeader)
+    {
+        if (string.IsNullOrWhiteSpace(authorizationHeader))
+        {
+            return null;
+        }
+
+        const string bearerPrefix = "Bearer ";
+        return authorizationHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+            ? authorizationHeader[bearerPrefix.Length..].Trim()
+            : authorizationHeader.Trim();
+    }
+
+    private static async Task<User> SyncLocalUserFromCognitoAsync(
+        IUserRepository userRepository,
+        string cognitoSub,
+        string email,
+        string? fullName,
+        CancellationToken cancellationToken)
+    {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        var normalizedFullName = fullName?.Trim();
+
+        var existingBySub = await userRepository.GetByCognitoSubAsync(cognitoSub, cancellationToken);
+        if (existingBySub is not null)
+        {
+            return await UpdateLocalUserProfileAsync(userRepository, existingBySub, normalizedEmail, normalizedFullName, cancellationToken);
+        }
+
+        var existingByEmail = await userRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
+        if (existingByEmail is not null)
+        {
+            if (!string.Equals(existingByEmail.CognitoSub, cognitoSub, StringComparison.Ordinal))
+            {
+                throw new AuthIdentityConflictException(normalizedEmail);
+            }
+
+            return await UpdateLocalUserProfileAsync(userRepository, existingByEmail, normalizedEmail, normalizedFullName, cancellationToken);
+        }
+
+        return await userRepository.AddAsync(new User
+        {
+            CognitoSub = cognitoSub,
+            Email = normalizedEmail,
+            FullName = normalizedFullName
+        }, cancellationToken);
+    }
+
+    private static async Task<User> UpdateLocalUserProfileAsync(
+        IUserRepository userRepository,
+        User user,
+        string email,
+        string? fullName,
+        CancellationToken cancellationToken)
+    {
+        var hasChanges =
+            !string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(user.FullName, fullName, StringComparison.Ordinal);
+
+        if (!hasChanges)
+        {
+            return user;
+        }
+
+        user.Email = email;
+        user.FullName = fullName;
+        return await userRepository.UpdateAsync(user, cancellationToken);
     }
 }

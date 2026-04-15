@@ -6,4 +6,5 @@ public interface ICognitoAuthProvider
     Task ConfirmSignUpAsync(VerifyOtpRequest request, CancellationToken cancellationToken = default);
     Task ResendConfirmationCodeAsync(ResendOtpRequest request, CancellationToken cancellationToken = default);
     Task<CognitoLoginResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
+    Task<CognitoUserProfileResult> GetUserProfileAsync(string accessToken, CancellationToken cancellationToken = default);
 }

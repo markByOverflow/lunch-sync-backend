@@ -154,6 +154,68 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
         EnsureSuccess(response, document, request.Email);
     }
 
+    public async Task<CognitoUserProfileResult> GetUserProfileAsync(
+        string accessToken,
+        CancellationToken cancellationToken = default)
+    {
+        LogCognitoConfigSnapshot("get-user");
+
+        var payload = new
+        {
+            AccessToken = accessToken
+        };
+
+        using var response = await SendCognitoRequestAsync(
+            "AWSCognitoIdentityProviderService.GetUser",
+            payload,
+            cancellationToken);
+
+        using var document = await ReadResponseDocumentAsync(response, cancellationToken);
+        EnsureSuccess(response, document);
+
+        var root = document.RootElement;
+        var attributes = root.TryGetProperty("UserAttributes", out var userAttributes)
+            ? userAttributes.EnumerateArray()
+            : Enumerable.Empty<JsonElement>();
+
+        string? cognitoSub = null;
+        string? email = null;
+        string? fullName = null;
+
+        foreach (var attribute in attributes)
+        {
+            var name = attribute.TryGetProperty("Name", out var nameElement)
+                ? nameElement.GetString()
+                : null;
+            var value = attribute.TryGetProperty("Value", out var valueElement)
+                ? valueElement.GetString()
+                : null;
+
+            switch (name)
+            {
+                case "sub":
+                    cognitoSub = value;
+                    break;
+                case "email":
+                    email = value;
+                    break;
+                case "name":
+                    fullName = value;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(cognitoSub) || string.IsNullOrWhiteSpace(email))
+        {
+            throw new InvalidOperationException("Cognito GetUser did not return required claims.");
+        }
+
+        return new CognitoUserProfileResult(
+            cognitoSub,
+            email.Trim().ToLowerInvariant(),
+            fullName?.Trim());
+    }
+
     public async Task ResendConfirmationCodeAsync(
         ResendOtpRequest request,
         CancellationToken cancellationToken = default)

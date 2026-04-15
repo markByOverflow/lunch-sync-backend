@@ -80,3 +80,9 @@ public sealed record CognitoLoginResult(
     [property: JsonPropertyName("email")] string Email,
     [property: JsonPropertyName("full_name")] string? FullName
 );
+
+public sealed record CognitoUserProfileResult(
+    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("full_name")] string? FullName
+);
