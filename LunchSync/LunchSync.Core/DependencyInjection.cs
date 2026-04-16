@@ -20,7 +20,7 @@ namespace LunchSync.Core
             services.AddScoped<IRestaurantService, RestaurantService>();
             services.AddScoped<IDishService, DishService>();
 
-            // services.AddScoped<IResultsService, ResultsService>();
+            services.AddScoped<IResultsService, ResultsService>();
             // services.AddScoped<IVotingService, VotingService>();
 
             // Pure stateless — Singleton

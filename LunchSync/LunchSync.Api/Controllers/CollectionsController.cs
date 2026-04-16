@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LunchSync.Api.Controllers;
 
 [ApiController]
-[Route("api/collections")]
+[Route("api/[controller]")]
 public class CollectionsController : ControllerBase
 {
     private readonly ICollectionService _collectionService;

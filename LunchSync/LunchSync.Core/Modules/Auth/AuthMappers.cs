@@ -7,10 +7,8 @@ public static class AuthMappers
     public static RegisterResponse ToRegisterResponse(this User user, string message)
     {
         return new RegisterResponse(
-            user.Id,
             user.Email,
             user.FullName,
-            user.Role.ToString().ToLowerInvariant(),
             message
         );
     }

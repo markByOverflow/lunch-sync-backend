@@ -55,7 +55,7 @@ public static class SessionsMappers
                         .FirstOrDefault() ?? "Unknown Host",
             CollectionName = session.Collection?.Name ?? "Unknown Collection",
             PriceTier = session.PriceTier.ToString(),
-            PriceDisplay = session.PriceTier.ToString() + "/phần",
+            PriceDisplay = ResolvePriceDisplay(session.PriceTier.ToString()),
             Participants = session.Participants.Select(p => new ParticipantRes
             {
                 Nickname = p.Nickname,
@@ -95,6 +95,17 @@ public static class SessionsMappers
             SessionId = session.Id,
             Pin = session.Pin,
             Status = session.Status.ToString().ToLower(),
+        };
+    }
+    private static string ResolvePriceDisplay(string priceTier)
+    {
+        return priceTier switch
+        {
+            "under_40k" => "Dưới 40k/phần",
+            "40_70k"    => "40–70k/phần",
+            "70_120k"   => "70–120k/phần",
+            "over_120k" => "Trên 120k/phần",
+            _           => priceTier
         };
     }
 }

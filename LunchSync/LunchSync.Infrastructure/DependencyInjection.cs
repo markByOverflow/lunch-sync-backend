@@ -50,6 +50,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddHttpClient<ICognitoAuthProvider, CognitoAuthProvider>();
+        services.AddScoped<IPendingRegistrationStore, PendingRegistrationStore>();
         services.AddScoped<ISessionCache, SessionCache>();
 
         // -- Caching --

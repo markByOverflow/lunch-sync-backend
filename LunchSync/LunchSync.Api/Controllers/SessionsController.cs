@@ -10,9 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LunchSync.Api.Controllers;
 
-[Authorize]
 [ApiController]
-[Route("api/sessions")]
+[Route("api/[controller]")]
 public class SessionsController : ControllerBase
 {
     private readonly ISessionService _sessionService;
@@ -40,7 +39,7 @@ public class SessionsController : ControllerBase
         var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
-            return Unauthorized();
+            throw new NotHostException();
         }
 
         var result = await _sessionService.CreateSessionAsync(request, hostId.Value);
@@ -53,10 +52,11 @@ public class SessionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> JoinAsync([FromRoute] string pin, [FromBody] JoinReq request, CancellationToken ct)
     {
-        // Guest join bang PIN va nickname, chua can host JWT.
         var validPin = Pin.Create(pin);
-        Guid? UserId = await GetCurrentHostIdAsync(ct) ?? null; // Giả sử UserId được lấy từ Token/Identity. Ở đây tạm lấy Guid mẫu.
-        var result = await _sessionService.JoinSessionAsync(UserId, validPin.Value, request, ct);
+        Guid? userId = _currentUser.IsAuthenticated
+            ? await GetCurrentHostIdAsync(ct)
+            : null;
+        var result = await _sessionService.JoinSessionAsync(userId, validPin.Value, request, ct);
         return Ok(result);
     }
 
@@ -70,7 +70,7 @@ public class SessionsController : ControllerBase
         var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
-            return Unauthorized();
+            throw new NotHostException();
         }
 
         var validPin = Pin.Create(pin);
@@ -83,14 +83,12 @@ public class SessionsController : ControllerBase
     [HttpPost("{pin}/cancel")]
     [ProducesResponseType(typeof(SessionCancelRes), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CancelAsync(
-        [FromRoute] string pin,
-        CancellationToken ct)
+    public async Task<IActionResult> CancelAsync([FromRoute] string pin, CancellationToken ct)
     {
         var hostId = await GetCurrentHostIdAsync(ct);
         if (hostId is null)
         {
-            return Unauthorized();
+            throw new NotHostException();
         }
 
         var result = await _sessionService.CancelSessionAsync(pin, hostId.Value, ct);

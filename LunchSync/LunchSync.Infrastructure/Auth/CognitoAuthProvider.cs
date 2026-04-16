@@ -131,6 +131,51 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
             fullName?.Trim());
     }
 
+    public async Task ConfirmSignUpAsync(
+        VerifyOtpRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LogCognitoConfigSnapshot("confirm-sign-up");
+
+        var payload = new
+        {
+            ClientId = GetRequiredConfig("Cognito:ClientId"),
+            SecretHash = BuildSecretHash(request.Email),
+            Username = request.Email.Trim().ToLowerInvariant(),
+            ConfirmationCode = request.Otp.Trim()
+        };
+
+        using var response = await SendCognitoRequestAsync(
+            "AWSCognitoIdentityProviderService.ConfirmSignUp",
+            payload,
+            cancellationToken);
+
+        using var document = await ReadResponseDocumentAsync(response, cancellationToken);
+        EnsureSuccess(response, document, request.Email);
+    }
+
+    public async Task ResendConfirmationCodeAsync(
+        ResendOtpRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LogCognitoConfigSnapshot("resend-confirmation-code");
+
+        var payload = new
+        {
+            ClientId = GetRequiredConfig("Cognito:ClientId"),
+            SecretHash = BuildSecretHash(request.Email),
+            Username = request.Email.Trim().ToLowerInvariant()
+        };
+
+        using var response = await SendCognitoRequestAsync(
+            "AWSCognitoIdentityProviderService.ResendConfirmationCode",
+            payload,
+            cancellationToken);
+
+        using var document = await ReadResponseDocumentAsync(response, cancellationToken);
+        EnsureSuccess(response, document, request.Email);
+    }
+
     private async Task<HttpResponseMessage> SendCognitoRequestAsync(
         string target,
         object payload,
@@ -206,15 +251,24 @@ public sealed class CognitoAuthProvider : ICognitoAuthProvider
             "UsernameExistsException" => new DuplicateEntityException("User", "email", email ?? "unknown"),
             "NotAuthorizedException" => new InvalidCredentialsException(),
             "UserNotFoundException" => new InvalidCredentialsException(),
+            "CodeMismatchException" => new ValidationException(
+                "Ma OTP khong dung.",
+                new Dictionary<string, string> { ["otp"] = message ?? "Ma OTP khong chinh xac." }),
+            "ExpiredCodeException" => new ValidationException(
+                "Ma OTP da het han.",
+                new Dictionary<string, string> { ["otp"] = message ?? "Ma OTP da het han, vui long yeu cau ma moi." }),
+            "LimitExceededException" => new ValidationException(
+                "Ban da yeu cau qua nhieu lan.",
+                new Dictionary<string, string> { ["otp"] = message ?? "Vui long doi it phut roi thu lai." }),
             "UserNotConfirmedException" => new ValidationException(
-                "Tài khoản chưa được xác nhận.",
-                new Dictionary<string, string> { ["email"] = "Vui lòng xác nhận email trước khi đăng nhập." }),
+                "Tai khoan chua duoc xac nhan.",
+                new Dictionary<string, string> { ["email"] = "Vui long xac nhan email truoc khi dang nhap." }),
             "InvalidPasswordException" => new ValidationException(
-                "Mật khẩu không hợp lệ.",
-                new Dictionary<string, string> { ["password"] = message ?? "Mật khẩu không đáp ứng policy của Cognito." }),
+                "Mat khau khong hop le.",
+                new Dictionary<string, string> { ["password"] = message ?? "Mat khau khong dap ung policy cua Cognito." }),
             "InvalidParameterException" => new ValidationException(
-                "Dữ liệu gửi lên không hợp lệ.",
-                new Dictionary<string, string> { ["auth"] = message ?? "Yêu cầu không hợp lệ." }),
+                "Du lieu gui len khong hop le.",
+                new Dictionary<string, string> { ["auth"] = message ?? "Yeu cau khong hop le." }),
             _ => new InvalidOperationException(message ?? "Cognito request failed.")
         };
     }

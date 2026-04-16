@@ -132,9 +132,13 @@ public class SessionService : ISessionService
         // Cập nhật trạng thái sang Voting
         await _cache.UpdateStatusAndExpireAsync(pin, SessionStatus.Voting, VotingExpiryMinutes);
         session.Status = SessionStatus.Voting;
+        session.VotingStartedAt = DateTime.UtcNow;
         await _repository.UpdateSessionAsync(session, s => s.Status, session.Status);
+        await _repository.UpdateSessionAsync(session, s => s.VotingStartedAt, session.VotingStartedAt);
 
         var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        sessionUpdate.Participants = participants;
+
         return sessionUpdate.ToStartRes();
     }
     public async Task<SessionCancelRes> CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)

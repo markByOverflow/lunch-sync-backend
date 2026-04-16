@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LunchSync.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260411214128_InitialCreate")]
+    [Migration("20260413073347_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -313,141 +313,6 @@ namespace LunchSync.Infrastructure.Migrations
                     b.ToTable("restaurant_dishes", (string)null);
                 });
 
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Submission", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("address");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("GoogleMapsUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("google_maps_url");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text")
-                        .HasColumnName("notes");
-
-                    b.Property<string>("PriceTier")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("price_tier");
-
-                    b.Property<string>("RestaurantName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("restaurant_name");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("reviewed_at");
-
-                    b.Property<Guid?>("ReviewedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("reviewed_by");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Pending")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_submissions");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("idx_submissions_status");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("idx_submissions_user");
-
-                    b.ToTable("submissions", (string)null);
-                });
-
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.SubmissionDish", b =>
-                {
-                    b.Property<Guid>("SubmissionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("submission_id");
-
-                    b.Property<Guid>("DishId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dish_id");
-
-                    b.HasKey("SubmissionId", "DishId")
-                        .HasName("pk_submission_dishes");
-
-                    b.HasIndex("DishId")
-                        .HasDatabaseName("ix_submission_dishes_dish_id");
-
-                    b.ToTable("submission_dishes", (string)null);
-                });
-
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.SubmissionPhoto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<int>("DisplayOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("display_order");
-
-                    b.Property<string>("PhotoUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("photo_url");
-
-                    b.Property<Guid>("SubmissionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("submission_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_submission_photos");
-
-                    b.HasIndex("SubmissionId")
-                        .HasDatabaseName("idx_submission_photos_sub");
-
-                    b.ToTable("submission_photos", (string)null);
-                });
-
             modelBuilder.Entity("LunchSync.Core.Modules.Sessions.Entities.Participant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -608,13 +473,7 @@ namespace LunchSync.Infrastructure.Migrations
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
-                            b1.Property<double>("Communal")
-                                .HasColumnType("double precision");
-
                             b1.Property<double>("FlavorIntensity")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double>("Healthy")
                                 .HasColumnType("double precision");
 
                             b1.Property<double>("Heaviness")
@@ -697,51 +556,6 @@ namespace LunchSync.Infrastructure.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Submission", b =>
-                {
-                    b.HasOne("LunchSync.Core.Modules.Auth.Entities.User", "User")
-                        .WithMany("Submissions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_submissions_users_user_id");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.SubmissionDish", b =>
-                {
-                    b.HasOne("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Dish", "Dish")
-                        .WithMany("SubmissionDishes")
-                        .HasForeignKey("DishId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_submission_dishes_dishes_dish_id");
-
-                    b.HasOne("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Submission", "Submission")
-                        .WithMany("SubmissionDishes")
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_submission_dishes_submissions_submission_id");
-
-                    b.Navigation("Dish");
-
-                    b.Navigation("Submission");
-                });
-
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.SubmissionPhoto", b =>
-                {
-                    b.HasOne("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Submission", "Submission")
-                        .WithMany("Photos")
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_submission_photos_submissions_submission_id");
-
-                    b.Navigation("Submission");
-                });
-
             modelBuilder.Entity("LunchSync.Core.Modules.Sessions.Entities.Participant", b =>
                 {
                     b.HasOne("LunchSync.Core.Modules.Sessions.Entities.Session", "Session")
@@ -790,11 +604,6 @@ namespace LunchSync.Infrastructure.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("LunchSync.Core.Modules.Auth.Entities.User", b =>
-                {
-                    b.Navigation("Submissions");
-                });
-
             modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Collection", b =>
                 {
                     b.Navigation("RestaurantCollections");
@@ -803,8 +612,6 @@ namespace LunchSync.Infrastructure.Migrations
             modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Dish", b =>
                 {
                     b.Navigation("RestaurantDishes");
-
-                    b.Navigation("SubmissionDishes");
                 });
 
             modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Restaurant", b =>
@@ -812,13 +619,6 @@ namespace LunchSync.Infrastructure.Migrations
                     b.Navigation("RestaurantCollections");
 
                     b.Navigation("RestaurantDishes");
-                });
-
-            modelBuilder.Entity("LunchSync.Core.Modules.RestaurantsAndDishes.Entities.Submission", b =>
-                {
-                    b.Navigation("Photos");
-
-                    b.Navigation("SubmissionDishes");
                 });
 
             modelBuilder.Entity("LunchSync.Core.Modules.Sessions.Entities.Session", b =>

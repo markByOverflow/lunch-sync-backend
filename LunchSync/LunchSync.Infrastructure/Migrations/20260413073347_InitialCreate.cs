@@ -181,34 +181,6 @@ namespace LunchSync.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "submissions",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    restaurant_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    address = table.Column<string>(type: "text", nullable: false),
-                    google_maps_url = table.Column<string>(type: "text", nullable: true),
-                    price_tier = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    notes = table.Column<string>(type: "text", nullable: true),
-                    status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Pending"),
-                    reviewed_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    reviewed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_submissions", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_submissions_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "participants",
                 columns: table => new
                 {
@@ -236,52 +208,6 @@ namespace LunchSync.Infrastructure.Migrations
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "submission_dishes",
-                columns: table => new
-                {
-                    submission_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    dish_id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_submission_dishes", x => new { x.submission_id, x.dish_id });
-                    table.ForeignKey(
-                        name: "fk_submission_dishes_dishes_dish_id",
-                        column: x => x.dish_id,
-                        principalTable: "dishes",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_submission_dishes_submissions_submission_id",
-                        column: x => x.submission_id,
-                        principalTable: "submissions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "submission_photos",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    submission_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    photo_url = table.Column<string>(type: "text", nullable: false),
-                    display_order = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_submission_photos", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_submission_photos_submissions_submission_id",
-                        column: x => x.submission_id,
-                        principalTable: "submissions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -348,26 +274,6 @@ namespace LunchSync.Infrastructure.Migrations
                 column: "final_restaurant_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_submission_dishes_dish_id",
-                table: "submission_dishes",
-                column: "dish_id");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_submission_photos_sub",
-                table: "submission_photos",
-                column: "submission_id");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_submissions_status",
-                table: "submissions",
-                column: "status");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_submissions_user",
-                table: "submissions",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "idx_users_cognito_sub",
                 table: "users",
                 column: "cognito_sub",
@@ -398,19 +304,10 @@ namespace LunchSync.Infrastructure.Migrations
                 name: "restaurant_dishes");
 
             migrationBuilder.DropTable(
-                name: "submission_dishes");
-
-            migrationBuilder.DropTable(
-                name: "submission_photos");
-
-            migrationBuilder.DropTable(
                 name: "sessions");
 
             migrationBuilder.DropTable(
                 name: "dishes");
-
-            migrationBuilder.DropTable(
-                name: "submissions");
 
             migrationBuilder.DropTable(
                 name: "collections");

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace LunchSync.Api.Controllers;
 
 [ApiController]
-[Route("api/auth")]
+[Route("api/[controller]")]
 public sealed class AuthController : ControllerBase
 {
     private readonly ICurrentUserService _currentUser;
@@ -42,7 +42,7 @@ public sealed class AuthController : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("auth-public")]
     [HttpPost("register")]
-    [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(
         [FromBody] RegisterRequest? request,
@@ -52,6 +52,36 @@ public sealed class AuthController : ControllerBase
             request ?? new RegisterRequest(string.Empty, string.Empty, null),
             cancellationToken);
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+
+    [AllowAnonymous]
+    [EnableRateLimiting("auth-public")]
+    [HttpPost("verify-otp")]
+    [ProducesResponseType(typeof(VerifyOtpResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyOtp(
+        [FromBody] VerifyOtpRequest? request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _authService.VerifyOtpAsync(
+            request ?? new VerifyOtpRequest(string.Empty, string.Empty),
+            cancellationToken);
+        return Ok(response);
+    }
+
+    [AllowAnonymous]
+    [EnableRateLimiting("auth-public")]
+    [HttpPost("resend-otp")]
+    [ProducesResponseType(typeof(ResendOtpResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResendOtp(
+        [FromBody] ResendOtpRequest? request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _authService.ResendOtpAsync(
+            request ?? new ResendOtpRequest(string.Empty),
+            cancellationToken);
+        return Ok(response);
     }
 
     [AllowAnonymous]

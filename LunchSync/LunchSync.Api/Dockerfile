@@ -30,7 +30,13 @@ RUN dotnet publish "LunchSync.Api.csproj" -c Release -o /app/publish /p:UseAppHo
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
-COPY --from=build /root/.dotnet/tools /root/.dotnet/tools
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+    COPY --from=build /root/.dotnet/tools /root/.dotnet/tools
+
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Copy DLL migrations

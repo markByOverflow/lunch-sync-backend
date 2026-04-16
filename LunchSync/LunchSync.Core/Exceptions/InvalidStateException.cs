@@ -5,7 +5,7 @@ namespace LunchSync.Core.Exceptions;
 //400
 public abstract class InvalidStateException : DomainException
 {
-    protected InvalidStateException(string message, string errorCode)
+    protected InvalidStateException(string message)
         : base(message, "INVALID_STATE", HttpStatusCode.BadRequest) { }
 }
 public class InsufficientParticipantsException : DomainException
@@ -50,3 +50,26 @@ public class VotingTimeoutException : DomainException
         : base("Thời gian bình chọn đã kết thúc (vượt quá 120 giây)", "VOTING_TIMEOUT", HttpStatusCode.Gone) { }
 }
 
+public class ResultsNotReadyException : InvalidStateException
+{
+    public ResultsNotReadyException(string message)
+        :base( message)
+    {
+    }
+}
+
+public class BoomNotReadyException : InvalidStateException
+{
+    public BoomNotReadyException(string message)
+        :base( message)
+    {
+    }
+}
+
+public class PickNotReadyException : InvalidStateException
+{
+    public PickNotReadyException(string message)
+        :base( message)
+    {
+    }
+}

@@ -74,7 +74,7 @@ public static class ResDisColMappers
             Name = restaurant.Name,
             Address = restaurant.Address,
             PriceTier = restaurant.PriceTier.ToString(),
-            PriceDisplay = restaurant.PriceTier.ToString() + "/phần",
+            PriceDisplay = ResolvePriceDisplay(restaurant.PriceTier.ToString()),
             Rating = restaurant.Rating ?? 0,
             ThumbnailUrl = restaurant.ThumbnailUrl,
             Collection = collectionName
@@ -105,7 +105,7 @@ public static class ResDisColMappers
             Name = r.Name,
             Address = r.Address,
             PriceTier = r.PriceTier.ToString(),
-            PriceDisplay = r.PriceTier.ToString() + "/phần",
+            PriceDisplay = ResolvePriceDisplay(r.PriceTier.ToString()),
             Rating = r.Rating ?? 0,
             ThumbnailUrl = r.ThumbnailUrl,
             FeaturedDishes = r.RestaurantDishes?
@@ -122,7 +122,7 @@ public static class ResDisColMappers
             Address = restaurant.Address,
             GoogleMapsUrl = restaurant.GoogleMapsUrl,
             PriceTier = restaurant.PriceTier.ToString(),
-            PriceDisplay = restaurant.PriceTier.ToString() + "/phần",
+            PriceDisplay = ResolvePriceDisplay(restaurant.PriceTier.ToString()),
             Rating = restaurant.Rating ?? 0,
             ThumbnailUrl = restaurant.ThumbnailUrl,
 
@@ -139,5 +139,15 @@ public static class ResDisColMappers
                 .ToList()
         };
     }
-
+    private static string ResolvePriceDisplay(string priceTier)
+    {
+        return priceTier switch
+        {
+            "under_40k" => "Dưới 40k/phần",
+            "40_70k" => "40–70k/phần",
+            "70_120k" => "70–120k/phần",
+            "over_120k" => "Trên 120k/phần",
+            _ => priceTier
+        };
+    }
 }

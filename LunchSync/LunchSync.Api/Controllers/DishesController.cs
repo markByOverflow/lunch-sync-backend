@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LunchSync.Api.Controllers;
 
 [ApiController]
-[Route("api/dishes")]
+[Route("api/[controller]")]
 public class DishesController : ControllerBase
 {
     private readonly IDishService _dishService;
