@@ -101,5 +101,8 @@ public sealed class SessionScoringService
 
         await _sessionCache.UpdateScoringResultsAsync(pin, groupVectorAsFloat, top3Ids, top5Ids, expireMinutes: 30);
         await _sessionCache.UpdateStatusAndExpireAsync(pin, SessionStatus.Results, expireMinutes:5);
+        await _uow.Sessions.UpdateSessionAsync(session, s => s.GroupVector, groupVectorAsFloat);
+        await _uow.Sessions.UpdateSessionAsync(session, s => s.TopDishIds, top3Ids);
+        await _uow.Sessions.UpdateSessionAsync(session, s => s.TopRestaurantIds, top5Ids);
     }
 }
