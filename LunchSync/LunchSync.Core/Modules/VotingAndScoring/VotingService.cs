@@ -93,7 +93,7 @@ public sealed class VotingService : IVotingService
 
     // ── POST close-voting (host lazy evaluation) ──────────────────────────────
 
-    public async Task CloseVotingAsync(string pin, Guid hostUserId, CancellationToken ct = default)
+    public async Task<CloseVoteRes> CloseVotingAsync(string pin, Guid hostUserId, CancellationToken ct = default)
     {
         var session = await _sessionCache.GetActiveSessionByPinAsync(pin, ct)
             ?? throw new SessionNotFoundException(pin);
@@ -111,5 +111,6 @@ public sealed class VotingService : IVotingService
             throw new VoteNotReadyException("No participants have voted yet.");
 
         await _scoringService.RunAsync(pin, ct);
+        return new CloseVoteRes(SessionStatus.Results.ToString());
     }
 }

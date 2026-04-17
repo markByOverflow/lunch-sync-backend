@@ -24,5 +24,5 @@ public interface IVotingService
     /// Host manually closes voting (lazy evaluation fallback).
     /// Runs scoring on participants who have voted so far.
     /// </summary>
-    Task CloseVotingAsync(string pin, Guid hostUserId, CancellationToken ct = default);
+    Task<CloseVoteRes> CloseVotingAsync(string pin, Guid hostUserId, CancellationToken ct = default);
 }

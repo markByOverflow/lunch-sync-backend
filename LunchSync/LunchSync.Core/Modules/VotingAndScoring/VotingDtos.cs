@@ -14,6 +14,9 @@ public sealed record SubmitVoteRequest(
     [property: JsonPropertyName("participant_id")] Guid participantId,
     [property: JsonPropertyName("choices")] string Choices
 );
+public sealed record CloseVoteRes(
+    [property: JsonPropertyName("status")] string Status
+);
 
 // ── Outbound
 

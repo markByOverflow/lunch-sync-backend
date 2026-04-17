@@ -53,7 +53,7 @@ public sealed class VotingController : ControllerBase
     /// <summary>POST by host to close voting early (lazy evaluation).</summary>
     [HttpPost("close")]
     [Authorize(Policy = AuthPolicies.CognitoUser)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CloseVoteRes), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CloseVoting([FromRoute] string pin, CancellationToken ct)
     {
@@ -62,8 +62,8 @@ public sealed class VotingController : ControllerBase
         {
             throw new NotHostException();
         }
-        await _votingService.CloseVotingAsync(pin, hostId.Value, ct);
-        return NoContent();
+        var result = await _votingService.CloseVotingAsync(pin, hostId.Value, ct);
+        return Ok(result);
     }
     private async Task<Guid?> GetCurrentHostIdAsync(CancellationToken cancellationToken)
     {
