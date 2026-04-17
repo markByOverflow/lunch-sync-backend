@@ -2,7 +2,7 @@
 
 namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 
-public class CollectionService : ICollectionService
+public sealed class CollectionService : ICollectionService
 {
     private readonly ICollectionRepository _collectionRepository;
 

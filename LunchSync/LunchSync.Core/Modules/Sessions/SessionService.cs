@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace LunchSync.Core.Modules.Sessions;
 
-public class SessionService : ISessionService
+public sealed class SessionService : ISessionService
 {
     private readonly ISessionCache _cache;
     private readonly ISessionRepository _repository;

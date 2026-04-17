@@ -13,7 +13,7 @@ using LunchSync.Core.Modules.Sessions.Entities;
 
 namespace LunchSync.Core.Modules.Sessions;
 
-internal class ResultsService : IResultsService
+public sealed class ResultsService : IResultsService
 {
     private readonly ISessionRepository _sessionRepo;
     private readonly IRestaurantRepository _restaurantRepo;
