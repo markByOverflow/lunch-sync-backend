@@ -1,4 +1,6 @@
-﻿using LunchSync.Core.Common.Enums;
+﻿using System.Text.Json;
+
+using LunchSync.Core.Common.Enums;
 using LunchSync.Core.Modules.Sessions.Entities;
 
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +36,13 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
                .HasFilter("status NOT IN ('done')");
 
 
-        builder.Property(e => e.GroupVector).HasColumnType("jsonb");
+        builder.Property(e => e.GroupVector)
+        .HasColumnType("jsonb")
+        .HasConversion(
+            v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default), // Chuyển List thành chuỗi JSON
+            v => JsonSerializer.Deserialize<List<float>>(v, JsonSerializerOptions.Default) ?? new List<float>() // Đọc ngược lại
+        );
+
         builder.Property(e => e.TopDishIds).HasColumnType("uuid[]");
         builder.Property(e => e.TopRestaurantIds).HasColumnType("uuid[]");
         builder.Property(e => e.BoomEliminatedIds).HasColumnType("uuid[]");
