@@ -68,9 +68,29 @@ public class SessionCache : ISessionCache
         var key = RedisKeyBuilder.Data(pin);
         var data = await _db.HashGetAllAsync(key);
         if (data.Length == 0)
-        { return null; }
+        {
+            return null;
+        }
 
         var dict = data.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+
+        // Helper to parse list fields
+        List<T>? ParseJsonList<T>(string fieldName)
+        {
+            if (dict.TryGetValue(fieldName, out var json) && !string.IsNullOrEmpty(json))
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<List<T>>(json);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            return null;
+        }
 
         return new Session
         {
@@ -81,7 +101,10 @@ public class SessionCache : ISessionCache
             CreatedAt = dict.TryGetValue("CreatedAt", out var tc) ? DateTime.Parse(tc) : DateTime.UtcNow,
             ExpiresAt = dict.TryGetValue("ExpiresAt", out var te) ? DateTime.Parse(te) : DateTime.MinValue,
             CollectionId = dict.TryGetValue("CollectionId", out var cId) ? Guid.Parse(cId) : Guid.Empty,
-            PriceTier = dict.TryGetValue("PriceTier", out var pt) ? Enum.Parse<PriceTier>(pt) : PriceTier.Under40k
+            PriceTier = dict.TryGetValue("PriceTier", out var pt) ? Enum.Parse<PriceTier>(pt) : PriceTier.Under40k,
+            GroupVector = ParseJsonList<float>("GroupVector"),
+            TopDishIds = ParseJsonList<Guid>("TopDishIds"),
+            TopRestaurantIds = ParseJsonList<Guid>("TopRestaurantIds")
         };
     }
     public async Task RemoveSessionAsync(string pin)
@@ -148,6 +171,62 @@ public class SessionCache : ISessionCache
         await _db.HashSetAsync(key, "Status", (int)newStatus);
 
         // 2. Gia hạn thời gian sống (TTL)
+        var ttl = TimeSpan.FromMinutes(expireMinutes);
+        await _db.KeyExpireAsync(key, ttl);
+        await _db.KeyExpireAsync(participantKey, ttl);
+        await _db.KeyExpireAsync(nameKey, ttl);
+    }
+
+    public async Task UpdateParticipantPrefVectorAsync(string pin, Participant participant, List<float> prefVector)
+    {
+        var participantKey = RedisKeyBuilder.Participants(pin);
+
+        // 1. Lấy tất cả các chuỗi JSON đang có trong Set
+        var members = await _db.SetMembersAsync(participantKey);
+
+        // 2. Tìm chuỗi JSON cũ của Participant này (dựa vào Id)
+        // Phải tìm đúng chuỗi "nguyên bản" trong Redis mới dùng SREM xóa được
+        var oldJson = members.FirstOrDefault(m =>
+            JsonSerializer.Deserialize<Participant>(m!)?.Id == participant.Id);
+
+        if (oldJson.IsNull)
+            return; // Không tìm thấy thì không làm gì cả
+
+        // 3. Tạo chuỗi JSON mới từ object đã có PrefVector mới
+        var newJson = JsonSerializer.Serialize(participant);
+
+        // 4. Thực hiện thay thế (Atomic)
+        var transaction = _db.CreateTransaction();
+        _ = transaction.SetRemoveAsync(participantKey, oldJson); // Xóa bản cũ (có PrefVector cũ hoặc null)
+        _ = transaction.SetAddAsync(participantKey, newJson);    // Thêm bản mới (có PrefVector mới)
+
+        await transaction.ExecuteAsync();
+
+    }
+
+    public async Task UpdateScoringResultsAsync(string pin, List<float> groupVector, List<Guid> topDishIds, List<Guid> topRestaurantIds, int expireMinutes)
+    {
+        var key = RedisKeyBuilder.Data(pin);
+        var participantKey = RedisKeyBuilder.Participants(pin);
+        var nameKey = RedisKeyBuilder.Names(pin);
+
+        // 1. Convert lists to JSON for storage
+        var groupVectorJson = JsonSerializer.Serialize(groupVector);
+        var topDishIdsJson = JsonSerializer.Serialize(topDishIds);
+        var topRestaurantIdsJson = JsonSerializer.Serialize(topRestaurantIds);
+
+        // 2. Update session hash with scoring results
+        var entries = new HashEntry[]
+        {
+            new("GroupVector", groupVectorJson),
+            new("TopDishIds", topDishIdsJson),
+            new("TopRestaurantIds", topRestaurantIdsJson),
+            new("Status", (int)SessionStatus.Results)
+        };
+
+        await _db.HashSetAsync(key, entries);
+
+        // 3. Update TTL for all related keys
         var ttl = TimeSpan.FromMinutes(expireMinutes);
         await _db.KeyExpireAsync(key, ttl);
         await _db.KeyExpireAsync(participantKey, ttl);

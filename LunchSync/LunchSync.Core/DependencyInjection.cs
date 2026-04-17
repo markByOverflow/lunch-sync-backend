@@ -21,7 +21,7 @@ namespace LunchSync.Core
             services.AddScoped<IDishService, DishService>();
 
             services.AddScoped<IResultsService, ResultsService>();
-            // services.AddScoped<IVotingService, VotingService>();
+            services.AddScoped<IVotingService, VotingService>();
 
             // Pure stateless — Singleton
             services.AddSingleton<ScoringEngine>();

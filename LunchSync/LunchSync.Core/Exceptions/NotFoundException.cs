@@ -41,3 +41,9 @@ public class SubmissionNotFoundException : NotFoundException
     public SubmissionNotFoundException(Guid submissionId)
         : base("Không tìm thấy submission", "SUBMISSION_NOT_FOUND") { }
 }
+
+public class ParticipantNotFoundException : NotFoundException
+{
+    public ParticipantNotFoundException(Guid participantId)
+        : base("Không tìm thấy người chơi", "PARTICIPANT_NOT_FOUND") { }
+}

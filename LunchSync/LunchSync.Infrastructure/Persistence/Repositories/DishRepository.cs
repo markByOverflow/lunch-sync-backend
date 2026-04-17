@@ -59,4 +59,17 @@ public class DishRepository : IDishRepository
                     .Select(d => new Dish { Id = d.Id, Name = d.Name, Profile = d.Profile })
                     .AsNoTracking().ToListAsync(ct);
     }
+
+    public async Task<List<Guid>> GetAvailableDishIdsByCollectionAsync(
+        Guid collectionId,
+        CancellationToken ct = default)
+    {
+        return await _context.RestaurantDishes
+            .Where(rd => _context.RestaurantCollections
+                .Any(rc => rc.CollectionId == collectionId
+                        && rc.RestaurantId == rd.RestaurantId))
+            .Select(rd => rd.DishId)
+            .Distinct()
+            .ToListAsync(ct);
+    }
 }

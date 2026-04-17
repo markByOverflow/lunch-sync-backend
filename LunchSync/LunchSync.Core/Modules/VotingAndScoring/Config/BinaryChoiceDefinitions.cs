@@ -39,12 +39,53 @@ public static class BinaryChoiceDefinitions
     /// </summary>
     public static readonly IReadOnlyList<BinaryChoice> All = new List<BinaryChoice>
     {
-
+        // BC-1: Nước vs Khô
+        new(0, "Nước vs Khô", "Nước", "Khô",
+            ImpactA: MakeVector((Soupy, +0.9), (Temperature, +0.3)),
+            ImpactB: MakeVector((Soupy, -0.9))),
+ 
+        // BC-2: Nóng vs Mát
+        new(1, "Nóng vs Mát", "Nóng", "Mát",
+            ImpactA: MakeVector((Temperature, +0.9), (Soupy, +0.2)),
+            ImpactB: MakeVector((Temperature, -0.7))),
+ 
+        // BC-3: Nhẹ vs No nê
+        new(2, "Nhẹ vs No nê", "Nhẹ", "No nê",
+            ImpactA: MakeVector((Heaviness, -0.8), (TimeRequired, -0.2)),
+            ImpactB: MakeVector((Heaviness, +0.9), (FlavorIntensity, +0.2))),
+ 
+        // BC-4: Mềm vs Dai giòn
+        new(3, "Mềm vs Dai giòn", "Mềm", "Dai giòn",
+            ImpactA: MakeVector((TextureComplexity, -0.7), (TimeRequired, -0.1)),
+            ImpactB: MakeVector((TextureComplexity, +0.8))),
+ 
+        // BC-5: Thanh vs Đậm đà
+        new(4, "Thanh vs Đậm đà", "Thanh", "Đậm đà",
+            ImpactA: MakeVector((FlavorIntensity, -0.8)),
+            ImpactB: MakeVector((FlavorIntensity, +0.9), (Heaviness, +0.2))),
+ 
+        // BC-6: Không cay vs Cay
+        new(5, "Không cay vs Cay", "Không cay", "Cay",
+            ImpactA: MakeVector((Spicy, -0.9)),
+            ImpactB: MakeVector((Spicy, +0.8), (FlavorIntensity, +0.3))),
+ 
+        // BC-7: Nhanh vs Thong thả
+        new(6, "Nhanh vs Thong thả", "Nhanh", "Thong thả",
+            ImpactA: MakeVector((TimeRequired, -0.9)),
+            ImpactB: MakeVector((TimeRequired, +0.7), (Novelty, +0.2))),
+ 
+        // BC-8: Comfort vs Thử lạ
+        new(7, "Comfort vs Thử lạ", "Comfort", "Thử lạ",
+            ImpactA: MakeVector((Novelty, -0.8), (FlavorIntensity, -0.1)),
+            ImpactB: MakeVector((Novelty, +0.9), (TextureComplexity, +0.2))),
     };
 
     // Helper
-    private static int MakeVector(params (int dim, double val)[] entries)
+    private static double[] MakeVector(params (int dim, double val)[] entries)
     {
-        return 0; // Placeholder, actual implementation would create a vector of length 8 with specified values
+        var v = new double[DimensionCount];
+        foreach (var (dim, val) in entries)
+            v[dim] = val;
+        return v;
     }
 }

@@ -1,4 +1,5 @@
-﻿using LunchSync.Core.Modules.RestaurantsAndDishes;
+﻿using LunchSync.Core.Modules.Auth.Interfaces;
+using LunchSync.Core.Modules.RestaurantsAndDishes;
 using LunchSync.Core.Modules.RestaurantsAndDishes.Repositories;
 using LunchSync.Core.Modules.Sessions;
 

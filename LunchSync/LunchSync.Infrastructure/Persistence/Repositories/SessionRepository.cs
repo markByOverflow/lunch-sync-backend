@@ -74,4 +74,12 @@ public class SessionRepository : ISessionRepository
         await _context.SaveChangesAsync();
     }
     // CÁCH DÙNG:await UpdateFieldAsync(session, s => s.Status, SessionStatus.Active);
+
+    public async Task UpdateParticipantVoteAsync(Participant participant, CancellationToken ct = default)
+    {
+        _context.Attach(participant);
+        _context.Entry(participant).Property(p => p.PrefVector).IsModified = true;
+        _context.Entry(participant).Property(p => p.VotedAt).IsModified = true;
+        await _context.SaveChangesAsync(ct);
+    }
 }

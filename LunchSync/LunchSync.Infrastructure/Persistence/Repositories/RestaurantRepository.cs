@@ -46,9 +46,10 @@ public class RestaurantRepository : IRestaurantRepository
     {
         return await _context.RestaurantCollections
             .Where(rc => rc.CollectionId == collectionId)
-            .Select(rc => rc.Restaurant)
-            .Include(r => r.RestaurantDishes)
-                .ThenInclude(rd => rd.Dish)
+            .Include(rc => rc.Restaurant)
+                .ThenInclude(r => r.RestaurantDishes)
+                    .ThenInclude(rd => rd.Dish)
+            .Select(rc => rc.Restaurant) // Select phải nằm ở cuối cùng
             .Where(r => r.RestaurantDishes.Any(rd => topDishIds.Contains(rd.DishId)))
             .AsNoTracking()
             .ToListAsync(ct);

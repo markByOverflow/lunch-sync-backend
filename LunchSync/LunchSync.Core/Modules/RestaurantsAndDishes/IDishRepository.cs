@@ -14,4 +14,7 @@ public interface IDishRepository
 
     // Nạp Cache IDishProfileCache (Scoring Engine)
     Task<List<Dish>> GetAllDishProfilesAsync(CancellationToken ct = default);
+
+    // Spec Returns distinct dish IDs available through a collection's restaurants.
+    Task<List<Guid>> GetAvailableDishIdsByCollectionAsync(Guid collectionId, CancellationToken ct = default);
 }

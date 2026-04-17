@@ -73,3 +73,11 @@ public class PickNotReadyException : InvalidStateException
     {
     }
 }
+
+public class VoteNotReadyException : InvalidStateException
+{
+    public VoteNotReadyException(string message)
+        :base( message)
+    {
+    }
+}

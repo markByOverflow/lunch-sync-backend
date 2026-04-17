@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LunchSync.Core.Modules.Sessions;
 public interface IResultsService
 {
-    Task<GetResultsDto>  GetResultsAsync(string pin, CancellationToken ct = default);
+    Task<GetResultsDto>  GetResultsAsync(string pin, Guid sessionId, CancellationToken ct = default);
     Task<BoomResultDto>  BoomAsync(string pin, Guid hostId, CancellationToken ct = default);
     Task<PickResultDto>  PickAsync(string pin, Guid hostId, Guid restaurantId, CancellationToken ct = default);
 }

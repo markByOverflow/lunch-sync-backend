@@ -1,4 +1,6 @@
-﻿using LunchSync.Core.Modules.Sessions.Entities;
+﻿using System.Text.Json;
+
+using LunchSync.Core.Modules.Sessions.Entities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -35,7 +37,11 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
 
         builder.Property(e => e.PrefVector)
         .HasColumnName("pref_vector")
-        .HasColumnType("jsonb");
+        .HasColumnType("jsonb")
+        .HasConversion(
+            v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default), // Chuyển List thành chuỗi JSON
+            v => JsonSerializer.Deserialize<List<float>>(v, JsonSerializerOptions.Default) ?? new List<float>() // Đọc ngược lại
+        );
 
         builder.Property(e => e.JoinedAt)
         .HasColumnName("joined_at")

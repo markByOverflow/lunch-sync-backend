@@ -33,9 +33,9 @@ public class ResultsController : ControllerBase
     [HttpGet("{pin}/results")]
     [ProducesResponseType(typeof(GetResultsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetResults(string pin, CancellationToken ct)
+    public async Task<IActionResult> GetResults([FromRoute]string pin, [FromRoute] Guid sessionId, CancellationToken ct)
     {
-        var result = await _resultsService.GetResultsAsync(pin, ct);
+        var result = await _resultsService.GetResultsAsync(pin, sessionId, ct);
         return Ok(result);
     }
 

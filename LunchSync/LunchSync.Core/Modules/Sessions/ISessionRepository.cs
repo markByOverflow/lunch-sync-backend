@@ -16,4 +16,10 @@ public interface ISessionRepository
     // Read history (đã done/cancelled)
     Task<Session?> GetSessionByIdAsync(Guid sessionId, CancellationToken ct = default);
     Task<Session?> GetLastSessionByHostIdAsync(Guid hostId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Persist a participant's vote result: PrefVector + VotedAt only.
+    /// Participant is attached and only those two columns are marked Modified.
+    /// </summary>
+    Task UpdateParticipantVoteAsync(Participant participant, CancellationToken ct = default);
 }
