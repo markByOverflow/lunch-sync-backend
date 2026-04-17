@@ -1,8 +1,6 @@
 using System.Security.Claims;
 using LunchSync.Core.Common.Auth;
-using LunchSync.Core.Modules.Auth.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LunchSync.Api.Authentication;
@@ -29,37 +27,35 @@ public static class JwtAuthenticationExtensions
             options.MapInboundClaims = false;
             options.Authority = cognitoIssuer;
             options.RequireHttpsMetadata = true;
-            // Validate token Cognito, con actor type duoc them o event ben duoi.
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidIssuer = cognitoIssuer,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(2),
-                NameClaimType = AuthClaimTypes.FullName,
-                RoleClaimType = AuthClaimTypes.Role
+                ClockSkew = TimeSpan.FromMinutes(2)
             };
             options.Events = new JwtBearerEvents
             {
-                OnTokenValidated = async context =>
+                OnTokenValidated = context =>
                 {
+                    var principal = context.Principal;
                     var identity = context.Principal?.Identity as ClaimsIdentity;
-                    if (identity is null)
+                    if (principal is null || identity is null)
                     {
-                        context.Fail("Missing identity.");
-                        return;
+                        context.Fail("Missing principal.");
+                        return Task.CompletedTask;
                     }
 
-                    var tokenUse = context.Principal?.FindFirst("token_use")?.Value;
-                    var subject = context.Principal?.FindFirst("sub")?.Value;
-                    var audience = context.Principal?.FindFirst("aud")?.Value;
-                    var clientId = context.Principal?.FindFirst("client_id")?.Value;
+                    var tokenUse = principal.FindFirst("token_use")?.Value;
+                    var subject = principal.FindFirst("sub")?.Value;
+                    var audience = principal.FindFirst("aud")?.Value;
+                    var clientId = principal.FindFirst("client_id")?.Value;
 
                     if (tokenUse != expectedTokenUse || string.IsNullOrWhiteSpace(subject))
                     {
                         context.Fail("Invalid Cognito token.");
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     if (!string.IsNullOrWhiteSpace(cognitoClientId)
@@ -67,27 +63,15 @@ public static class JwtAuthenticationExtensions
                         && clientId != cognitoClientId)
                     {
                         context.Fail("Invalid Cognito audience.");
-                        return;
+                        return Task.CompletedTask;
                     }
 
-                    var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                    var localUser = await userRepository.GetByCognitoSubAsync(subject, context.HttpContext.RequestAborted);
-                    if (localUser is null || !localUser.IsActive)
-                    {
-                        context.Fail("Local user is missing or inactive.");
-                        return;
-                    }
-
-                    if (!identity.HasClaim(claim => claim.Type == AuthClaimTypes.ActorType))
-                    {
-                        identity.AddClaim(new Claim(AuthClaimTypes.ActorType, AuthActorTypes.User));
-                    }
-
-                    AddOrReplaceClaim(identity, AuthClaimTypes.LocalUserId, localUser.Id.ToString());
-                    AddOrReplaceClaim(identity, AuthClaimTypes.Role, localUser.Role.ToString().ToLowerInvariant());
+                    AddOrReplaceClaim(identity, AuthClaimTypes.ActorType, AuthActorTypes.User);
                     AddOrReplaceClaim(identity, AuthClaimTypes.IsActive, bool.TrueString);
-                    AddOrReplaceClaim(identity, AuthClaimTypes.Email, localUser.Email);
-                    AddOrReplaceClaim(identity, AuthClaimTypes.FullName, localUser.FullName);
+                    CopyClaim(principal, identity, "email", AuthClaimTypes.Email);
+                    CopyClaim(principal, identity, "name", AuthClaimTypes.FullName);
+
+                    return Task.CompletedTask;
                 }
             };
         });
@@ -108,5 +92,15 @@ public static class JwtAuthenticationExtensions
         }
 
         identity.AddClaim(new Claim(claimType, value));
+    }
+
+    private static void CopyClaim(
+        ClaimsPrincipal principal,
+        ClaimsIdentity identity,
+        string sourceClaimType,
+        string targetClaimType)
+    {
+        var value = principal.FindFirst(sourceClaimType)?.Value;
+        AddOrReplaceClaim(identity, targetClaimType, value);
     }
 }

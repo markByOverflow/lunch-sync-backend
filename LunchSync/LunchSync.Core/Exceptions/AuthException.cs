@@ -16,7 +16,7 @@ public abstract class AuthenticationException : DomainException
 public sealed class InvalidCredentialsException : AuthenticationException
 {
     public InvalidCredentialsException()
-        : base("Email hoặc mật khẩu không đúng.", "INVALID_CREDENTIALS")
+        : base("Email hoac mat khau khong dung.", "INVALID_CREDENTIALS")
     {
     }
 }
@@ -24,7 +24,7 @@ public sealed class InvalidCredentialsException : AuthenticationException
 public sealed class InactiveUserException : ForbiddenException
 {
     public InactiveUserException()
-        : base("Tài khoản hiện đang bị vô hiệu hóa.", "USER_INACTIVE")
+        : base("Tai khoan hien dang bi vo hieu hoa.", "USER_INACTIVE")
     {
     }
 }
@@ -32,7 +32,19 @@ public sealed class InactiveUserException : ForbiddenException
 public sealed class AuthIdentityConflictException : ConflictException
 {
     public AuthIdentityConflictException(string email)
-        : base($"Email '{email}' đang được liên kết với một tài khoản khác.", "AUTH_IDENTITY_CONFLICT")
+        : base($"Email '{email}' dang duoc lien ket voi mot tai khoan khac.", "AUTH_IDENTITY_CONFLICT")
+    {
+    }
+}
+
+public sealed class AuthProviderUnavailableException : DomainException
+{
+    public AuthProviderUnavailableException(string provider, Exception innerException)
+        : base(
+            message: $"Khong the ket noi den {provider}.",
+            errorCode: "AUTH_PROVIDER_UNAVAILABLE",
+            statusCode: HttpStatusCode.BadGateway,
+            innerException: innerException)
     {
     }
 }

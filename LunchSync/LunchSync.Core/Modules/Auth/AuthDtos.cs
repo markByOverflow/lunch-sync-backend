@@ -1,88 +1,51 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace LunchSync.Core.Modules.Auth;
 
-public sealed record RegisterRequest(
-    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
-    [property: JsonPropertyName("email")] string Email,
-
-    [param: Required(ErrorMessage = "Mat khau la bat buoc."), MinLength(6, ErrorMessage = "Mat khau phai co it nhat 6 ky tu.")]
-    [property: JsonPropertyName("password")] string Password,
-
-    [property: JsonPropertyName("full_name")] string? FullName
+public sealed record AuthCallbackRequest(
+    [property: JsonPropertyName("code")]
+    string Code
 );
 
-public sealed record RegisterResponse(
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName,
-    [property: JsonPropertyName("message")] string Message
+public sealed record RefreshTokenRequest(
+    [property: JsonPropertyName("refresh_token")]
+    string RefreshToken
 );
 
-public sealed record VerifyOtpRequest(
-    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
-    [property: JsonPropertyName("email")] string Email,
-    [param: Required(ErrorMessage = "Ma OTP la bat buoc."), MinLength(6, ErrorMessage = "Ma OTP phai co it nhat 6 ky tu.")]
-    [property: JsonPropertyName("otp")] string Otp
+public sealed record RevokeTokenRequest(
+    [property: JsonPropertyName("refresh_token")]
+    string RefreshToken
 );
 
-public sealed record VerifyOtpResponse(
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("message")] string Message
-);
-
-public sealed record ResendOtpRequest(
-    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
-    [property: JsonPropertyName("email")] string Email
-);
-
-public sealed record ResendOtpResponse(
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("message")] string Message
-);
-
-public sealed record LoginRequest(
-    [param: Required(ErrorMessage = "Email la bat buoc."), EmailAddress(ErrorMessage = "Email khong dung dinh dang.")]
-    [property: JsonPropertyName("email")] string Email,
-
-    [param: Required(ErrorMessage = "Mat khau la bat buoc."), MinLength(6, ErrorMessage = "Mat khau phai co it nhat 6 ky tu.")]
-    [property: JsonPropertyName("password")] string Password
-);
-
-public sealed record LoginResponse(
+public sealed record AuthTokenResponse(
     [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("id_token")] string? IdToken,
+    [property: JsonPropertyName("refresh_token")] string? RefreshToken,
+    [property: JsonPropertyName("token_type")] string TokenType,
     [property: JsonPropertyName("expires_in")] int ExpiresIn,
-    [property: JsonPropertyName("user_id")] Guid UserId,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName,
-    [property: JsonPropertyName("role")] string Role
+    [property: JsonPropertyName("user")] CurrentUserResponse User
 );
 
 public sealed record CurrentUserResponse(
-    [property: JsonPropertyName("user_id")] Guid? UserId,
-    [property: JsonPropertyName("cognito_sub")] string? CognitoSub,
-    [property: JsonPropertyName("email")] string? Email,
-    [property: JsonPropertyName("full_name")] string? FullName,
-    [property: JsonPropertyName("role")] string? Role,
-    [property: JsonPropertyName("is_active")] bool IsActive
+    Guid? UserId,
+    string? CognitoSub,
+    string? Email,
+    string? FullName,
+    string? Role,
+    bool IsActive
 );
 
-public sealed record CognitoRegisterResult(
-    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName
-);
-
-public sealed record CognitoLoginResult(
+public sealed record CognitoTokenResponse(
     [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("id_token")] string? IdToken,
+    [property: JsonPropertyName("refresh_token")] string? RefreshToken,
+    [property: JsonPropertyName("token_type")] string TokenType,
     [property: JsonPropertyName("expires_in")] int ExpiresIn,
-    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName
+    [property: JsonPropertyName("scope")] string? Scope
 );
 
 public sealed record CognitoUserProfileResult(
-    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
+    [property: JsonPropertyName("sub")] string CognitoSub,
     [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName
+    [property: JsonPropertyName("name")] string? FullName
 );

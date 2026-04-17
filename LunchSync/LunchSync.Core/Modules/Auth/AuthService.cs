@@ -1,4 +1,3 @@
-using EmailAddressAttribute = System.ComponentModel.DataAnnotations.EmailAddressAttribute;
 using LunchSync.Core.Exceptions;
 using LunchSync.Core.Modules.Auth.Entities;
 using LunchSync.Core.Modules.Auth.Interfaces;
@@ -7,357 +6,172 @@ namespace LunchSync.Core.Modules.Auth;
 
 public sealed class AuthService : IAuthService
 {
-    private static readonly EmailAddressAttribute EmailValidator = new();
     private readonly IUserRepository _userRepository;
-    private readonly ICognitoAuthProvider _cognitoAuthProvider;
-    private readonly IPendingRegistrationStore _pendingRegistrationStore;
+    private readonly ICognitoOAuthProvider _cognitoOAuthProvider;
 
     public AuthService(
         IUserRepository userRepository,
-        ICognitoAuthProvider cognitoAuthProvider,
-        IPendingRegistrationStore pendingRegistrationStore)
+        ICognitoOAuthProvider cognitoOAuthProvider)
     {
         _userRepository = userRepository;
-        _cognitoAuthProvider = cognitoAuthProvider;
-        _pendingRegistrationStore = pendingRegistrationStore;
+        _cognitoOAuthProvider = cognitoOAuthProvider;
     }
 
-    public async Task<RegisterResponse> RegisterAsync(
-        RegisterRequest request,
+    public async Task<AuthTokenResponse> ExchangeCodeAsync(
+        AuthCallbackRequest request,
         CancellationToken cancellationToken = default)
     {
-        var normalizedEmail = NormalizeAndValidateRegisterRequest(request);
+        ValidateExchangeCodeRequest(request);
 
-        var cognitoResult = await _cognitoAuthProvider.RegisterAsync(
-            request with { Email = normalizedEmail },
-            cancellationToken);
+        var tokenResponse = await _cognitoOAuthProvider.ExchangeCodeAsync(request, cancellationToken);
+        var profile = await _cognitoOAuthProvider.GetUserProfileAsync(tokenResponse.AccessToken, cancellationToken);
+        var localUser = await SyncLocalUserAsync(profile, cancellationToken);
 
-        var existingBySub = await _userRepository.GetByCognitoSubAsync(cognitoResult.CognitoSub, cancellationToken);
-        if (existingBySub is not null)
-        {
-            if (!string.Equals(existingBySub.Email, cognitoResult.Email, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new AuthIdentityConflictException(cognitoResult.Email);
-            }
+        EnsureUserIsActive(localUser);
 
-            return new RegisterResponse(
-                existingBySub.Email,
-                existingBySub.FullName,
-                "Tai khoan da ton tai. Ban co the dang nhap.");
-        }
-
-        var existingByEmail = await _userRepository.GetByEmailAsync(cognitoResult.Email, cancellationToken);
-        if (existingByEmail is not null)
-        {
-            if (!string.Equals(existingByEmail.CognitoSub, cognitoResult.CognitoSub, StringComparison.Ordinal))
-            {
-                throw new AuthIdentityConflictException(cognitoResult.Email);
-            }
-
-            return new RegisterResponse(
-                existingByEmail.Email,
-                existingByEmail.FullName,
-                "Tai khoan da ton tai. Ban co the dang nhap.");
-        }
-
-        await _pendingRegistrationStore.SaveAsync(cognitoResult, cancellationToken);
-
-        return new RegisterResponse(
-            cognitoResult.Email,
-            cognitoResult.FullName?.Trim(),
-            "Dang ky thanh cong. Vui long xac thuc OTP de hoan tat.");
+        return tokenResponse.ToAuthTokenResponse(localUser);
     }
 
-    public async Task<VerifyOtpResponse> VerifyOtpAsync(
-        VerifyOtpRequest request,
+    public async Task<AuthTokenResponse> RefreshTokenAsync(
+        RefreshTokenRequest request,
         CancellationToken cancellationToken = default)
     {
-        var normalizedEmail = NormalizeAndValidateVerifyOtpRequest(request);
-        var pendingRegistration = await _pendingRegistrationStore.GetAsync(normalizedEmail, cancellationToken);
+        ValidateRefreshTokenRequest(request);
 
-        await _cognitoAuthProvider.ConfirmSignUpAsync(
-            request with { Email = normalizedEmail, Otp = request.Otp.Trim() },
-            cancellationToken);
+        var tokenResponse = await _cognitoOAuthProvider.RefreshTokenAsync(request, cancellationToken);
+        var profile = await _cognitoOAuthProvider.GetUserProfileAsync(tokenResponse.AccessToken, cancellationToken);
+        var localUser = await SyncLocalUserAsync(profile, cancellationToken);
 
-        if (pendingRegistration is not null)
-        {
-            await SyncLocalUserForConfirmedRegistrationAsync(pendingRegistration, cancellationToken);
-        }
+        EnsureUserIsActive(localUser);
 
-        await _pendingRegistrationStore.RemoveAsync(normalizedEmail, cancellationToken);
+        var refreshToken = string.IsNullOrWhiteSpace(tokenResponse.RefreshToken)
+            ? request.RefreshToken.Trim()
+            : tokenResponse.RefreshToken;
 
-        return new VerifyOtpResponse(
-            normalizedEmail,
-            "Xac thuc OTP thanh cong. Ban co the dang nhap.");
+        return (tokenResponse with { RefreshToken = refreshToken })
+            .ToAuthTokenResponse(localUser);
     }
 
-    public async Task<ResendOtpResponse> ResendOtpAsync(
-        ResendOtpRequest request,
+    public Task RevokeTokenAsync(
+        RevokeTokenRequest request,
         CancellationToken cancellationToken = default)
     {
-        var normalizedEmail = NormalizeAndValidateResendOtpRequest(request);
-        var pendingRegistration = await _pendingRegistrationStore.GetAsync(normalizedEmail, cancellationToken);
-
-        await _cognitoAuthProvider.ResendConfirmationCodeAsync(
-            request with { Email = normalizedEmail },
-            cancellationToken);
-
-        if (pendingRegistration is not null)
-        {
-            await _pendingRegistrationStore.SaveAsync(pendingRegistration, cancellationToken);
-        }
-
-        return new ResendOtpResponse(
-            normalizedEmail,
-            "Da gui lai ma OTP. Vui long kiem tra email.");
+        ValidateRevokeTokenRequest(request);
+        return _cognitoOAuthProvider.RevokeTokenAsync(request, cancellationToken);
     }
 
-    public async Task<LoginResponse> LoginAsync(
-        LoginRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var normalizedEmail = NormalizeAndValidateLoginRequest(request);
-
-        var cognitoResult = await _cognitoAuthProvider.LoginAsync(
-            request with { Email = normalizedEmail },
-            cancellationToken);
-
-        var user = await ResolveLocalUserForLoginAsync(cognitoResult, cancellationToken);
-
-        if (!user.IsActive)
-        {
-            throw new InactiveUserException();
-        }
-
-        return user.ToLoginResponse(cognitoResult.AccessToken, cognitoResult.ExpiresIn);
-    }
-
-    private static string NormalizeAndValidateRegisterRequest(RegisterRequest request)
-    {
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
-        var details = new Dictionary<string, string>();
-
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-        {
-            details["email"] = "Email la bat buoc.";
-        }
-        else if (!EmailValidator.IsValid(normalizedEmail))
-        {
-            details["email"] = "Email khong dung dinh dang.";
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Password))
-        {
-            details["password"] = "Mat khau la bat buoc.";
-        }
-        else if (!IsValidPassword(request.Password))
-        {
-            details["password"] = "Mat khau phai co it nhat 8 ky tu, gom 1 chu hoa, 1 so va 1 ky tu dac biet.";
-        }
-
-        if (details.Count > 0)
-        {
-            throw new ValidationException("Du lieu dang ky khong hop le.", details);
-        }
-
-        return normalizedEmail!;
-    }
-
-    private static string NormalizeAndValidateVerifyOtpRequest(VerifyOtpRequest request)
-    {
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
-        var otp = request.Otp?.Trim();
-        var details = new Dictionary<string, string>();
-
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-        {
-            details["email"] = "Email la bat buoc.";
-        }
-        else if (!EmailValidator.IsValid(normalizedEmail))
-        {
-            details["email"] = "Email khong dung dinh dang.";
-        }
-
-        if (string.IsNullOrWhiteSpace(otp))
-        {
-            details["otp"] = "Ma OTP la bat buoc.";
-        }
-        else if (otp.Length < 6)
-        {
-            details["otp"] = "Ma OTP phai co it nhat 6 ky tu.";
-        }
-
-        if (details.Count > 0)
-        {
-            throw new ValidationException("Du lieu xac thuc OTP khong hop le.", details);
-        }
-
-        return normalizedEmail!;
-    }
-
-    private static string NormalizeAndValidateResendOtpRequest(ResendOtpRequest request)
-    {
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
-        var details = new Dictionary<string, string>();
-
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-        {
-            details["email"] = "Email la bat buoc.";
-        }
-        else if (!EmailValidator.IsValid(normalizedEmail))
-        {
-            details["email"] = "Email khong dung dinh dang.";
-        }
-
-        if (details.Count > 0)
-        {
-            throw new ValidationException("Du lieu gui lai OTP khong hop le.", details);
-        }
-
-        return normalizedEmail!;
-    }
-
-    private static string NormalizeAndValidateLoginRequest(LoginRequest request)
-    {
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant();
-        var details = new Dictionary<string, string>();
-
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-        {
-            details["email"] = "Email la bat buoc.";
-        }
-        else if (!EmailValidator.IsValid(normalizedEmail))
-        {
-            details["email"] = "Email khong dung dinh dang.";
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Password))
-        {
-            details["password"] = "Mat khau la bat buoc.";
-        }
-
-        if (details.Count > 0)
-        {
-            throw new ValidationException("Du lieu dang nhap khong hop le.", details);
-        }
-
-        return normalizedEmail!;
-    }
-
-    private async Task<User> SyncLocalUserForConfirmedRegistrationAsync(
-        CognitoRegisterResult registration,
+    private async Task<User> SyncLocalUserAsync(
+        CognitoUserProfileResult profile,
         CancellationToken cancellationToken)
     {
-        var existingBySub = await _userRepository.GetByCognitoSubAsync(registration.CognitoSub, cancellationToken);
+        var normalizedEmail = profile.Email.Trim().ToLowerInvariant();
+        var normalizedFullName = profile.FullName?.Trim();
+
+        var existingBySub = await _userRepository.GetByCognitoSubAsync(profile.CognitoSub, cancellationToken);
         if (existingBySub is not null)
         {
-            if (!string.Equals(existingBySub.Email, registration.Email, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new AuthIdentityConflictException(registration.Email);
-            }
-
-            return await SyncRegisteredUserProfileAsync(existingBySub, registration, cancellationToken);
+            return await SyncUserProfileAsync(existingBySub, normalizedEmail, normalizedFullName, cancellationToken);
         }
 
-        var existingByEmail = await _userRepository.GetByEmailAsync(registration.Email, cancellationToken);
+        var existingByEmail = await _userRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
         if (existingByEmail is not null)
         {
-            if (!string.Equals(existingByEmail.CognitoSub, registration.CognitoSub, StringComparison.Ordinal))
+            if (!string.Equals(existingByEmail.CognitoSub, profile.CognitoSub, StringComparison.Ordinal))
             {
-                throw new AuthIdentityConflictException(registration.Email);
+                throw new AuthIdentityConflictException(normalizedEmail);
             }
 
-            return await SyncRegisteredUserProfileAsync(existingByEmail, registration, cancellationToken);
+            return await SyncUserProfileAsync(existingByEmail, normalizedEmail, normalizedFullName, cancellationToken);
         }
 
         return await _userRepository.AddAsync(new User
         {
-            CognitoSub = registration.CognitoSub,
-            Email = registration.Email,
-            FullName = registration.FullName?.Trim()
+            CognitoSub = profile.CognitoSub,
+            Email = normalizedEmail,
+            FullName = normalizedFullName
         }, cancellationToken);
-    }
-
-    private async Task<User> ResolveLocalUserForLoginAsync(
-        CognitoLoginResult cognitoResult,
-        CancellationToken cancellationToken)
-    {
-        var existingBySub = await _userRepository.GetByCognitoSubAsync(cognitoResult.CognitoSub, cancellationToken);
-        if (existingBySub is not null)
-        {
-            return await SyncUserProfileAsync(existingBySub, cognitoResult, cancellationToken);
-        }
-
-        var existingByEmail = await _userRepository.GetByEmailAsync(cognitoResult.Email, cancellationToken);
-        if (existingByEmail is not null)
-        {
-            if (!string.Equals(existingByEmail.CognitoSub, cognitoResult.CognitoSub, StringComparison.Ordinal))
-            {
-                throw new AuthIdentityConflictException(cognitoResult.Email);
-            }
-
-            return await SyncUserProfileAsync(existingByEmail, cognitoResult, cancellationToken);
-        }
-
-        return await _userRepository.AddAsync(new User
-        {
-            CognitoSub = cognitoResult.CognitoSub,
-            Email = cognitoResult.Email,
-            FullName = cognitoResult.FullName?.Trim()
-        }, cancellationToken);
-    }
-
-    private async Task<User> SyncRegisteredUserProfileAsync(
-        User user,
-        CognitoRegisterResult registration,
-        CancellationToken cancellationToken)
-    {
-        var normalizedFullName = registration.FullName?.Trim();
-        var hasChanges =
-            !string.Equals(user.Email, registration.Email, StringComparison.OrdinalIgnoreCase)
-            || !string.Equals(user.FullName, normalizedFullName, StringComparison.Ordinal);
-
-        if (!hasChanges)
-        {
-            return user;
-        }
-
-        user.Email = registration.Email;
-        user.FullName = normalizedFullName;
-        return await _userRepository.UpdateAsync(user, cancellationToken);
     }
 
     private async Task<User> SyncUserProfileAsync(
         User user,
-        CognitoLoginResult cognitoResult,
+        string email,
+        string? fullName,
         CancellationToken cancellationToken)
     {
-        var normalizedFullName = cognitoResult.FullName?.Trim();
         var hasChanges =
-            !string.Equals(user.Email, cognitoResult.Email, StringComparison.OrdinalIgnoreCase)
-            || !string.Equals(user.FullName, normalizedFullName, StringComparison.Ordinal);
+            !string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(user.FullName, fullName, StringComparison.Ordinal);
 
         if (!hasChanges)
         {
             return user;
         }
 
-        user.Email = cognitoResult.Email;
-        user.FullName = normalizedFullName;
+        user.Email = email;
+        user.FullName = fullName;
+
         return await _userRepository.UpdateAsync(user, cancellationToken);
     }
 
-    private static bool IsValidPassword(string password)
+    private static void ValidateExchangeCodeRequest(AuthCallbackRequest request)
     {
-        if (password.Length < 8)
+        if (string.IsNullOrWhiteSpace(request.Code))
         {
-            return false;
+            throw new ValidationException(
+                "Du lieu doi authorization code khong hop le.",
+                new Dictionary<string, string> { ["code"] = "Authorization code la bat buoc." });
+        }
+    }
+
+    private static void ValidateRefreshTokenRequest(RefreshTokenRequest request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            return;
         }
 
-        var hasUpper = password.Any(char.IsUpper);
-        var hasDigit = password.Any(char.IsDigit);
-        var hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
+        throw new ValidationException(
+            "Du lieu refresh token khong hop le.",
+            new Dictionary<string, string> { ["refresh_token"] = "Refresh token la bat buoc." });
+    }
 
-        return hasUpper && hasDigit && hasSpecial;
+    private static void ValidateRevokeTokenRequest(RevokeTokenRequest request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            return;
+        }
+
+        throw new ValidationException(
+            "Du lieu revoke token khong hop le.",
+            new Dictionary<string, string> { ["refresh_token"] = "Refresh token la bat buoc." });
+    }
+
+    private static void EnsureUserIsActive(User user)
+    {
+        if (!user.IsActive)
+        {
+            throw new InactiveUserException();
+        }
+    }
+}
+
+file static class AuthResponseMappings
+{
+    public static AuthTokenResponse ToAuthTokenResponse(this CognitoTokenResponse tokenResponse, User localUser)
+    {
+        return new AuthTokenResponse(
+            tokenResponse.AccessToken,
+            tokenResponse.IdToken,
+            tokenResponse.RefreshToken,
+            tokenResponse.TokenType,
+            tokenResponse.ExpiresIn,
+            new CurrentUserResponse(
+                localUser.Id,
+                localUser.CognitoSub,
+                localUser.Email,
+                localUser.FullName,
+                localUser.Role.ToString().ToLowerInvariant(),
+                localUser.IsActive));
     }
 }
