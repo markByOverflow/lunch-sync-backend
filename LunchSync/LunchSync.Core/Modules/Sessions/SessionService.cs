@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace LunchSync.Core.Modules.Sessions;
 
-public class SessionService : ISessionService
+public sealed class SessionService : ISessionService
 {
     private readonly ISessionCache _cache;
     private readonly ISessionRepository _repository;
@@ -50,6 +50,14 @@ public class SessionService : ISessionService
         if (string.IsNullOrEmpty(pin))
             throw new BusinessRuleViolationException("Không thể tạo mã PIN. Vui lòng thử lại.");
 
+        var host = new Participant
+        {
+            Id = Guid.NewGuid(),
+            SessionId = sessionId,
+            Nickname = request.Nickname,
+            JoinedAt = DateTime.UtcNow,
+            UserId = HostId
+        };
         var session = new Session
         {
             Id = sessionId,
@@ -64,14 +72,6 @@ public class SessionService : ISessionService
         await _repository.SaveSessionAsync(session);
         await _cache.SaveActiveSessionAsync(session, DefaultExpiryMinutes);
 
-        var host = new Participant
-        {
-            Id = Guid.NewGuid(),
-            SessionId = session.Id,
-            Nickname = request.Nickname,
-            JoinedAt = DateTime.UtcNow,
-            UserId = HostId
-        };
 
         await _cache.TryJoinAtomicAsync(pin, host, MaxParticipants, DefaultExpiryMinutes);
         await _repository.SaveParticipantAsync(host);
@@ -79,8 +79,7 @@ public class SessionService : ISessionService
         var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin) ?? throw new SessionNotFoundException(pin);
 
         var baseUrl = _configuration["AppSettings:ClientBaseUrl"];
-        return sessionUpdate.ToCreateSessionRes(collection.Name ?? "", baseUrl ?? "");
-
+        return sessionUpdate.ToCreateSessionRes(host.Id, collection.Name ?? "", baseUrl ?? "");
     }
     public async Task<JoinRes> JoinSessionAsync(Guid? userId, string pin, JoinReq request, CancellationToken ct = default)
     {
@@ -132,9 +131,14 @@ public class SessionService : ISessionService
         // Cập nhật trạng thái sang Voting
         await _cache.UpdateStatusAndExpireAsync(pin, SessionStatus.Voting, VotingExpiryMinutes);
         session.Status = SessionStatus.Voting;
+        session.VotingStartedAt = DateTime.UtcNow;
         await _repository.UpdateSessionAsync(session, s => s.Status, session.Status);
+        await _repository.UpdateSessionAsync(session, s => s.VotingStartedAt, session.VotingStartedAt);
 
         var sessionUpdate = await _cache.GetActiveSessionByPinAsync(pin, ct) ?? throw new SessionNotFoundException(pin);
+        sessionUpdate.Participants = participants;
+        sessionUpdate.VotingStartedAt = DateTime.UtcNow;
+
         return sessionUpdate.ToStartRes();
     }
     public async Task<SessionCancelRes> CancelSessionAsync(string pin, Guid hostId, CancellationToken ct = default)

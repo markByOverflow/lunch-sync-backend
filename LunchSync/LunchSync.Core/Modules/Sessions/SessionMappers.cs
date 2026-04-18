@@ -5,7 +5,7 @@ namespace LunchSync.Core.Modules.Sessions;
 
 public static class SessionsMappers
 {
-    public static CreateSessionRes ToCreateSessionRes(this Session session, string collectionName, string baseUrl)
+    public static CreateSessionRes ToCreateSessionRes(this Session session, Guid hostId, string collectionName, string baseUrl)
     {
         return new CreateSessionRes
         {
@@ -14,7 +14,7 @@ public static class SessionsMappers
             ShareLink = $"{baseUrl}/{session.Pin}",
             Status = session.Status.ToString().ToLower(),
             CollectionName = collectionName,
-            participantId = session.HostId,
+            ParticipantId = hostId,
         };
     }
     public static JoinRes ToJoinRes(this Participant participant, Session session)
@@ -28,6 +28,7 @@ public static class SessionsMappers
             {
                 Nickname = p.Nickname,
                 JoinedAt = p.JoinedAt,
+                Id = p.Id,
                 IsHost = p.UserId == session.HostId,
             }).ToList()
         };
@@ -38,7 +39,7 @@ public static class SessionsMappers
         {
             Status = session.Status.ToString().ToLower(),
             ParticipantsJoined = session.Participants.Count,
-            ParticipantsVoted = session.GroupVector?.Count ?? 0,
+            ParticipantsVoted = session.Participants.Count(p => p.PrefVector != null),
             VotingStartedAt = session.VotingStartedAt
         };
     }
@@ -55,11 +56,12 @@ public static class SessionsMappers
                         .FirstOrDefault() ?? "Unknown Host",
             CollectionName = session.Collection?.Name ?? "Unknown Collection",
             PriceTier = session.PriceTier.ToString(),
-            PriceDisplay = session.PriceTier.ToString() + "/phần",
+            PriceDisplay = ResolvePriceDisplay(session.PriceTier.ToString()),
             Participants = session.Participants.Select(p => new ParticipantRes
             {
                 Nickname = p.Nickname,
                 JoinedAt = p.JoinedAt,
+                Id = p.Id,
                 IsHost = p.UserId == session.HostId,
             }).ToList(),
             ParticipantCount = session.Participants.Count,
@@ -95,6 +97,17 @@ public static class SessionsMappers
             SessionId = session.Id,
             Pin = session.Pin,
             Status = session.Status.ToString().ToLower(),
+        };
+    }
+    private static string ResolvePriceDisplay(string priceTier)
+    {
+        return priceTier switch
+        {
+            "under_40k" => "Dưới 40k/phần",
+            "40_70k"    => "40–70k/phần",
+            "70_120k"   => "70–120k/phần",
+            "over_120k" => "Trên 120k/phần",
+            _           => priceTier
         };
     }
 }

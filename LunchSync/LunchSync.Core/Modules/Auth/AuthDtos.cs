@@ -1,37 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace LunchSync.Core.Modules.Auth;
 
-public sealed record RegisterRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
-
-    [property: Required, MinLength(6), JsonPropertyName("password")] string Password,
-
-    [property: JsonPropertyName("full_name")] string? FullName
+public sealed record AuthCallbackRequest(
+    [property: JsonPropertyName("code")]
+    string Code
 );
 
-public sealed record RegisterResponse(
-    [property: JsonPropertyName("user_id")] Guid UserId,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName,
-    [property: JsonPropertyName("role")] string Role,
-    [property: JsonPropertyName("message")] string Message
+public sealed record RefreshTokenRequest(
+    [property: JsonPropertyName("refresh_token")]
+    string RefreshToken
 );
 
-public sealed record LoginRequest(
-    [property: Required, EmailAddress, JsonPropertyName("email")] string Email,
-
-    [property: Required, MinLength(6), JsonPropertyName("password")] string Password
+public sealed record RevokeTokenRequest(
+    [property: JsonPropertyName("refresh_token")]
+    string RefreshToken
 );
 
-public sealed record LoginResponse(
+public sealed record AuthTokenResponse(
     [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("id_token")] string? IdToken,
+    [property: JsonPropertyName("refresh_token")] string? RefreshToken,
+    [property: JsonPropertyName("token_type")] string TokenType,
     [property: JsonPropertyName("expires_in")] int ExpiresIn,
-    [property: JsonPropertyName("user_id")] Guid UserId,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName,
-    [property: JsonPropertyName("role")] string Role
+    [property: JsonPropertyName("user")] CurrentUserResponse User
 );
 
 public sealed record CurrentUserResponse(
@@ -43,16 +35,17 @@ public sealed record CurrentUserResponse(
     bool IsActive
 );
 
-public sealed record CognitoRegisterResult(
-    [property: JsonPropertyName("cognito_sub")] string CognitoSub,
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("full_name")] string? FullName
+public sealed record CognitoTokenResponse(
+    [property: JsonPropertyName("access_token")] string AccessToken,
+    [property: JsonPropertyName("id_token")] string? IdToken,
+    [property: JsonPropertyName("refresh_token")] string? RefreshToken,
+    [property: JsonPropertyName("token_type")] string TokenType,
+    [property: JsonPropertyName("expires_in")] int ExpiresIn,
+    [property: JsonPropertyName("scope")] string? Scope
 );
 
-public sealed record CognitoLoginResult(
-    string AccessToken,
-    int ExpiresIn,
-    string CognitoSub,
-    string Email,
-    string? FullName
+public sealed record CognitoUserProfileResult(
+    [property: JsonPropertyName("sub")] string CognitoSub,
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("name")] string? FullName
 );

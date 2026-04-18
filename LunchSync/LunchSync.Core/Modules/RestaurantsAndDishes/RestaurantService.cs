@@ -2,7 +2,7 @@
 
 namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 
-public class RestaurantService : IRestaurantService
+public sealed class RestaurantService : IRestaurantService
 {
     private readonly IRestaurantRepository _restaurantRepository;
 

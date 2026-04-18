@@ -2,7 +2,7 @@
 
 namespace LunchSync.Core.Modules.RestaurantsAndDishes;
 
-public class DishService : IDishService
+public sealed class DishService : IDishService
 {
     private readonly IDishRepository _dishRepository;
 

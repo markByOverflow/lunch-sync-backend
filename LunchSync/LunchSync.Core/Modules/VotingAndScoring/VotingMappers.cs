@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using LunchSync.Core.Modules.VotingAndScoring.Config;
+
 namespace LunchSync.Core.Modules.VotingAndScoring;
-internal class VotingMappers
+public static class VotingMappers
 {
+    public static BinaryChoiceDto ToDto(this BinaryChoice bc) =>
+        new(bc.Index, bc.Label, bc.OptionA, bc.OptionB);
 }

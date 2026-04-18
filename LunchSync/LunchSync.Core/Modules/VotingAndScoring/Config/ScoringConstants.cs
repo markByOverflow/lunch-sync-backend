@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LunchSync.Core.Modules.VotingAndScoring.Config;
+﻿namespace LunchSync.Core.Modules.VotingAndScoring.Config;
 
 public static class ScoringConstants
 {

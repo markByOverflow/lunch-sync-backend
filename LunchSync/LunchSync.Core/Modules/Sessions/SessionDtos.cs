@@ -37,9 +37,8 @@ public class CreateSessionRes
 
     [JsonPropertyName("collection_name")]
     public string CollectionName { get; set; } = string.Empty;
-
     [JsonPropertyName("participant_id")]
-    public Guid participantId { get; set; }
+    public Guid ParticipantId { get; set; }
 }
 
 public class JoinReq
@@ -82,6 +81,8 @@ public class ParticipantRes
 
     [JsonPropertyName("nickname")]
     public string Nickname { get; set; } = string.Empty;
+    [JsonPropertyName("id")]
+    public Guid Id { get; set; }
 
     [JsonPropertyName("joined_at")]
     public DateTime JoinedAt { get; set; }

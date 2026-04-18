@@ -1,4 +1,3 @@
-using System.Threading.RateLimiting;
 using LunchSync.Api.Authentication;
 using LunchSync.Api.Middleware;
 using LunchSync.Api.Swagger;
@@ -6,9 +5,7 @@ using LunchSync.Core;
 using LunchSync.Core.Common.Auth;
 using LunchSync.Core.Common.Interfaces;
 using LunchSync.Infrastructure;
-using Microsoft.AspNetCore.RateLimiting;
 using LunchSync.Infrastructure.Persistence;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -31,7 +28,7 @@ public class Program
             options.AddPolicy("AllowFrontend",
                 policy =>
                 {
-                    policy.WithOrigins("https://lunchsync.space") // Domain FE của bạn
+                    policy.WithOrigins("https://lunchsync.space") // Domain FE cua ban
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -39,19 +36,8 @@ public class Program
         });
 
         builder.Services.AddEndpointsApiExplorer();
-        // Cau hinh auth theo JWT cho user va guest.
+        // Backend chi verify Cognito token cho protected API.
         builder.Services.AddLunchSyncAuthentication(builder.Configuration);
-        builder.Services.AddRateLimiter(options =>
-        {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            options.AddFixedWindowLimiter("auth-public", limiterOptions =>
-            {
-                limiterOptions.PermitLimit = 5;
-                limiterOptions.Window = TimeSpan.FromMinutes(1);
-                limiterOptions.QueueLimit = 0;
-                limiterOptions.AutoReplenishment = true;
-            });
-        });
 
         builder.Services.AddAuthorization(options =>
         {
@@ -62,7 +48,6 @@ public class Program
         });
 
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddHttpClient();
         builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         builder.Services.AddSwaggerGen(options =>
@@ -109,21 +94,78 @@ public class Program
                 var context = services.GetRequiredService<AppDbContext>();
                 Console.WriteLine($"[DEBUG] DB Connection: {context.Database.GetDbConnection().DataSource} | DB Name: {context.Database.GetDbConnection().Database}");
                 Console.WriteLine("[STARTUP] Running migrations...");
+                var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+
+                if (pendingMigrations.Contains("20260413073347_InitialCreate"))
+                {
+                    var conn = context.Database.GetDbConnection();
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "SELECT COUNT(1) FROM information_schema.tables WHERE table_name = 'collections' AND table_schema = 'public'";
+                    var result = (long)cmd.ExecuteScalar()!;
+                    conn.Close();
+
+                    if (result > 0)
+                    {
+                        Console.WriteLine("[STARTUP] Schema already exists, stamping InitialCreate...");
+                        context.Database.ExecuteSqlRaw(
+                            "INSERT INTO \"__EFMigrationsHistory\" (migration_id, product_version) " +
+                            "VALUES ('20260413073347_InitialCreate', '9.0.14') " +
+                            "ON CONFLICT DO NOTHING");
+                    }
+                }
+
                 context.Database.Migrate();
-                Console.WriteLine("Migrations finished!");
+
+                var sqlFiles = new[]
+                {
+                    "seed_dishes.sql",
+                    "seed_core_data_database_design.sql",
+                    "seed_restaurant_dishes.sql"
+                };
+
+                foreach (var fileName in sqlFiles)
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, "Seed", fileName);
+                    if (File.Exists(path))
+                    {
+                        Console.WriteLine($"[STARTUP] Seeding data from {fileName}...");
+                        string sql = File.ReadAllText(path);
+
+                        var connectionString = context.Database.GetConnectionString();
+                        using var conn = new Npgsql.NpgsqlConnection(connectionString);
+                        conn.Open();
+
+                        try
+                        {
+                            using var cmd = conn.CreateCommand();
+                            cmd.CommandText = sql;
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine($"[STARTUP] Seeded {fileName} successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[ERROR] Error in {fileName}: {ex.Message}");
+                            throw;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[STARTUP] File not found, skipping: {fileName}");
+                    }
+                }
+
+                Console.WriteLine("[STARTUP] All migrations and seeding finished!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Migration failed: " + ex.Message);
+                Console.WriteLine("Critical Startup Failure: " + ex.Message);
                 throw;
             }
         }
 
-
         // Gom loi domain/unhandled ve mot format response thong nhat.
         app.UseGlobalExceptionHandler();
-
-        app.UseRateLimiter();
 
         app.UseCors("AllowFrontend");
         // Xac thuc truoc, phan quyen sau.

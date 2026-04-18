@@ -20,6 +20,8 @@ public class RestaurantRepository : IRestaurantRepository
         return await _context.Restaurants
             .Include(r => r.RestaurantDishes)      // Vào bảng trung gian
                 .ThenInclude(rd => rd.Dish)        // Vào bảng Dish để lấy Name
+            .Include(r => r.RestaurantCollections)
+                .ThenInclude(rc => rc.Collection)
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, ct);
     }
@@ -33,6 +35,8 @@ public class RestaurantRepository : IRestaurantRepository
         return await _context.Restaurants
             .Include(r => r.RestaurantDishes)
                 .ThenInclude(rd => rd.Dish)
+            .Include(r => r.RestaurantCollections)
+                .ThenInclude(rc => rc.Collection)
             .Where(r => ids.Contains(r.Id))
             .AsNoTracking()
             .ToListAsync(ct);
@@ -42,9 +46,10 @@ public class RestaurantRepository : IRestaurantRepository
     {
         return await _context.RestaurantCollections
             .Where(rc => rc.CollectionId == collectionId)
-            .Select(rc => rc.Restaurant)
-            .Include(r => r.RestaurantDishes)
-                .ThenInclude(rd => rd.Dish)
+            .Include(rc => rc.Restaurant)
+                .ThenInclude(r => r.RestaurantDishes)
+                    .ThenInclude(rd => rd.Dish)
+            .Select(rc => rc.Restaurant) // Select phải nằm ở cuối cùng
             .Where(r => r.RestaurantDishes.Any(rd => topDishIds.Contains(rd.DishId)))
             .AsNoTracking()
             .ToListAsync(ct);
